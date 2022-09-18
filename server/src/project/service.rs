@@ -1,6 +1,9 @@
-use axum::{routing::{post, get}, Router, extract::Path, Json};
+use axum::{
+    extract::Path,
+    routing::{get, post},
+    Json, Router,
+};
 use chrono::Utc;
-
 
 use crate::common::new_nanoid;
 
@@ -17,7 +20,11 @@ impl ProjectService {
 }
 
 async fn create_project(Json(new_project): Json<NewProject>) -> String {
-    let project = Project { id: new_nanoid(), name: new_project.name, created_at: Utc::now() };
+    let project = Project {
+        id: new_nanoid(),
+        name: new_project.name,
+        created_at: Utc::now(),
+    };
     format!("New project created!")
 }
 

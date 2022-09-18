@@ -1,14 +1,14 @@
 use axum::Router;
 use std::net::SocketAddr;
-use tower_http::{trace::TraceLayer};
+use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::project::service::ProjectService;
 
-mod project;
 mod common;
 mod feedback;
 mod profile;
+mod project;
 
 #[tokio::main]
 async fn main() {
