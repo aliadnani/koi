@@ -26,8 +26,6 @@ pub struct FeedbackMetadata {
 /// A new feedback entry - with only required fields from client
 #[derive(Deserialize, Serialize)]
 pub struct NewFeedback {
-    /// Id of feedback
-    pub id: String,
     /// Main body of feedback
     pub description: String,
     /// Page/URL feedback came from
@@ -36,8 +34,8 @@ pub struct NewFeedback {
     pub category: FeedbackCategory,
     /// Any additional attributes specifed by client
     pub additional_attributes: HashMap<String, String>,
-    // project_id is specified in the path - no need in body
-    // pub project_id: String,
+    /// The project the feedback entry belongs to
+    pub project_id: String,
 }
 
 /// A standard feedback entry
@@ -59,6 +57,4 @@ pub struct Feedback {
     pub additional_attributes: HashMap<String, String>,
     /// The project the feedback entry belongs to
     pub project_id: String,
-    /// The date of which feedback was submitted
-    pub created_at: DateTime<Utc>,
 }

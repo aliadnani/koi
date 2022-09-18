@@ -6,21 +6,31 @@ use axum::{
     Extension, Json, Router,
 };
 
+use crate::feedback::repo::FeedbackRepositoryDyn;
+
 use super::{model::NewProject, repo::ProjectRepositoryDyn};
 
 pub struct ProjectService {
     pub project_repo: ProjectRepositoryDyn,
+    pub feedback_repo: FeedbackRepositoryDyn,
 }
 
 impl ProjectService {
-    pub fn new(project_repo: ProjectRepositoryDyn) -> ProjectService {
-        ProjectService { project_repo }
+    pub fn new(
+        project_repo: ProjectRepositoryDyn,
+        feedback_repo: FeedbackRepositoryDyn,
+    ) -> ProjectService {
+        ProjectService {
+            project_repo,
+            feedback_repo,
+        }
     }
 
     pub fn routes(&self) -> Router {
         Router::new()
             .route("/projects", post(create_project))
             .route("/projects/:project_id", get(get_project))
+            .route("/projects/:project_id/feedback", get(get_project))
             .layer(Extension(self.project_repo.to_owned()))
     }
 }

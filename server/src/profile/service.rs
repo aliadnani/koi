@@ -34,14 +34,6 @@ async fn create_profile(
     (StatusCode::OK, Json(profile)).into_response()
 }
 
-async fn create_profile_project(
-    Json(new_profile): Json<NewProfile>,
-    Extension(repo): Extension<ProfileRepositoryDyn>,
-) -> impl IntoResponse {
-    let profile = repo.create_profile(&new_profile).await.unwrap();
-
-    (StatusCode::OK, Json(profile)).into_response()
-}
 
 async fn get_profile(
     Path(profile_id): Path<String>,

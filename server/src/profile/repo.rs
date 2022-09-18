@@ -67,7 +67,7 @@ impl ProfileRepository for ProfileRepositorySqlite {
                         name: row.get(1)?,
                         email: row.get(2)?,
                         created_at: {
-                            let date: String = row.get(4)?;
+                            let date: String = row.get(3)?;
                             DateTime::parse_from_rfc3339(&date)
                                 .expect("Timezones in db should be rfc3339!")
                                 .with_timezone(&Utc)

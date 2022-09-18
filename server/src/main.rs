@@ -5,6 +5,7 @@ use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::{
+    feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
     profile::{repo::ProfileRepositorySqlite, service::ProfileService},
     project::{repo::ProjectRepositorySqlite, service::ProjectService},
 };
@@ -34,6 +35,16 @@ async fn main() {
         .pragma_update(None, "journal_mode", &"WAL")
         .expect("Failed to set journal mode to WAL");
 
+    pool.get()
+        .unwrap()
+        .pragma_update(None, "foreign_keys", &"ON")
+        .expect("Failed to enable strict mode");
+
+    pool.get()
+        .unwrap()
+        .pragma_update(None, "strict", &"ON")
+        .expect("Failed to enable foreign keys");
+
     db::sqlite::migrations()
         .to_latest(&mut pool.get().unwrap())
         .expect("Failed to run migrations");
@@ -41,14 +52,17 @@ async fn main() {
     // Initialize repos
     let project_repo = Arc::new(ProjectRepositorySqlite::new(pool.clone()));
     let profile_repo = Arc::new(ProfileRepositorySqlite::new(pool.clone()));
+    let feedback_repo = Arc::new(FeedbackRepositorySqlite::new(pool.clone()));
 
     // Initialize services
-    let project_service = ProjectService::new(project_repo);
-    let profile_service = ProfileService::new(profile_repo);
+    let project_service = ProjectService::new(project_repo, feedback_repo.clone());
+    let profile_service = ProfileService::new(profile_repo.clone());
+    let feedback_service = FeedbackService::new(feedback_repo.clone());
 
     let app = Router::new()
         .merge(project_service.routes())
         .merge(profile_service.routes())
+        .merge(feedback_service.routes())
         .layer(TraceLayer::new_for_http());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 6122));

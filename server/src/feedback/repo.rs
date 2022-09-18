@@ -1,7 +1,7 @@
 use std::{str::FromStr, sync::Arc};
 
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
+use chrono::{Utc};
 use eyre::Result;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -16,13 +16,9 @@ pub type FeedbackRepositoryDyn = Arc<dyn FeedbackRepository + Send + Sync>;
 /// `FeedbackRepository` is abstracted to a trait to allow for using a seperate `FeedbackRepository` in tests
 #[async_trait]
 pub trait FeedbackRepository {
-    async fn create_feedback(
-        &self,
-        project_id: &String,
-        new_feedback: &NewFeedback,
-    ) -> Result<Feedback>;
+    async fn create_feedback(&self, new_feedback: &NewFeedback) -> Result<Feedback>;
 
-    async fn get_feedback(&self, project_id: &String, id: &String) -> Result<Option<Feedback>>;
+    async fn get_feedback(&self, id: &String) -> Result<Option<Feedback>>;
 }
 
 pub struct FeedbackRepositorySqlite {
@@ -37,11 +33,7 @@ impl FeedbackRepositorySqlite {
 
 #[async_trait]
 impl FeedbackRepository for FeedbackRepositorySqlite {
-    async fn create_feedback(
-        &self,
-        project_id: &String,
-        new_feedback: &NewFeedback,
-    ) -> Result<Feedback> {
+    async fn create_feedback(&self, new_feedback: &NewFeedback) -> Result<Feedback> {
         let feedback = Feedback {
             id: new_nanoid(),
             description: new_feedback.description.clone(),
@@ -53,14 +45,13 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
                 device: "???".to_string(),
             },
             additional_attributes: new_feedback.additional_attributes.clone(),
-            project_id: project_id.clone(),
-            created_at: Utc::now(),
+            project_id: new_feedback.project_id.clone(),
         };
 
         let _created = self.conn.get()?.execute(
             "
-            INSERT INTO feedback (id, description, location, status, category, metadata, additional_attributes, project_id, created_at)
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);",
+            INSERT INTO feedback (id, description, location, status, category, metadata, additional_attributes, project_id)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);",
             (
                 &feedback.id,
                 &feedback.description,
@@ -69,29 +60,24 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
                 &feedback.category.to_string(),
                 serde_json::to_string(&feedback.metadata).unwrap(),
                 serde_json::to_string(&feedback.additional_attributes).unwrap(),
-                &feedback.project_id,
-                &feedback.created_at.to_rfc3339(),
+                &feedback.project_id
             ),
         )?;
 
         Ok(feedback)
     }
 
-    async fn get_feedback(
-        &self,
-        project_id: &String,
-        feedback_id: &String,
-    ) -> Result<Option<Feedback>> {
+    async fn get_feedback(&self, feedback_id: &String) -> Result<Option<Feedback>> {
         let feedback = self
             .conn
             .get()?
             .query_row(
                 "
-                SELECT id, description, location, status, category, metadata, additional_attributes, project_id, created_at
+                SELECT id, description, location, status, category, metadata, additional_attributes, project_id
                 FROM feedback
-                WHERE id = ?1 AND project_id = ?2
+                WHERE id = ?1;
                 ",
-                [feedback_id, project_id],
+                [feedback_id],
                 |row| {
                     Ok(Feedback {
                         id: row.get(0)?,
@@ -105,13 +91,7 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
                         },
                         metadata: {let metadata: String = row.get(5)?;serde_json::from_str(&metadata).unwrap()},
                         additional_attributes: {let additional_attributes: String = row.get(6)?;serde_json::from_str(&additional_attributes).unwrap()},
-                        project_id: row.get(7)?,
-                        created_at: {
-                            let date: String = row.get(7)?;
-                            DateTime::parse_from_rfc3339(&date)
-                                .expect("Timezones in db should be rfc3339!")
-                                .with_timezone(&Utc)
-                        },
+                        project_id: row.get(7)?
                     })
                 },
             )

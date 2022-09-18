@@ -44,7 +44,7 @@ pub fn migrations() -> Migrations<'static> {
             metadata TEXT NOT NULL,
             additional_attributes TEXT NOT NULL,
             project_id TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            FOREIGN KEY (project_id) REFERENCES projects (id)
         );
         "#,
         ),
