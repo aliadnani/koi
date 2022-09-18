@@ -20,11 +20,11 @@ impl FeedbackService {
     pub fn routes(&self) -> Router {
         Router::new()
             .route("/feedback", post(create_feedback))
-            .route("/feedback/:feedback_id", get(get_feedback))
             .layer(Extension(self.feedback_repo.to_owned()))
     }
 }
 
+// TODO: Check project_id constraint
 async fn create_feedback(
     Json(new_feedback): Json<NewFeedback>,
     Extension(repo): Extension<FeedbackRepositoryDyn>,
@@ -38,9 +38,8 @@ async fn get_feedback(
     Path(feedback_id): Path<String>,
     Extension(repo): Extension<FeedbackRepositoryDyn>,
 ) -> impl IntoResponse {
-    let response = match repo.get_feedback(&feedback_id).await.unwrap() {
+    match repo.get_feedback(&feedback_id).await.unwrap() {
         Some(feedback) => (StatusCode::OK, Json(feedback)).into_response(),
         None => (StatusCode::NOT_FOUND).into_response(),
-    };
-    response
+    }
 }

@@ -1,20 +1,24 @@
 use axum::Router;
 use r2d2_sqlite::SqliteConnectionManager;
 use std::{net::SocketAddr, sync::Arc};
-use tower_http::trace::TraceLayer;
+use tower_http::{catch_panic::CatchPanicLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::{
     feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
-    profile::{repo::ProfileRepositorySqlite, service::ProfileService},
     project::{repo::ProjectRepositorySqlite, service::ProjectService},
+    sessions::SessionRepositorySqlite,
+    users::{repo::UserRepositorySqlite, service::UserService},
 };
 
 mod common;
 mod db;
 mod feedback;
-mod profile;
+mod http;
+mod openapi;
 mod project;
+mod sessions;
+mod users;
 
 #[tokio::main]
 async fn main() {
@@ -27,7 +31,8 @@ async fn main() {
         .init();
 
     // Initialize DB
-    let manager = SqliteConnectionManager::memory();
+    let manager = SqliteConnectionManager::file("koi.db");
+    // let manager = SqliteConnectionManager::memory();
     let pool = Arc::new(r2d2::Pool::new(manager).unwrap());
 
     pool.get()
@@ -51,19 +56,26 @@ async fn main() {
 
     // Initialize repos
     let project_repo = Arc::new(ProjectRepositorySqlite::new(pool.clone()));
-    let profile_repo = Arc::new(ProfileRepositorySqlite::new(pool.clone()));
+    let user_repo = Arc::new(UserRepositorySqlite::new(pool.clone()));
     let feedback_repo = Arc::new(FeedbackRepositorySqlite::new(pool.clone()));
+    let session_repo = Arc::new(SessionRepositorySqlite::new(pool.clone()));
 
     // Initialize services
-    let project_service = ProjectService::new(project_repo, feedback_repo.clone());
-    let profile_service = ProfileService::new(profile_repo.clone());
+    let project_service = ProjectService::new(
+        project_repo.clone(),
+        feedback_repo.clone(),
+        user_repo.clone(),
+        session_repo.clone(),
+    );
+    let profile_service = UserService::new(user_repo.clone(), session_repo.clone());
     let feedback_service = FeedbackService::new(feedback_repo.clone());
 
     let app = Router::new()
         .merge(project_service.routes())
         .merge(profile_service.routes())
         .merge(feedback_service.routes())
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(CatchPanicLayer::new());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 6122));
     tracing::debug!("Server started on {}!", addr);

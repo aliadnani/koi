@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 async-trait = "0.1.57"
 axum = "0.5.16"
+base64 = "0.13.0"
 chrono = { version = "0.4.22", features = ["serde"] }
 eyre = "0.6.8"
 nanoid = "0.4.0"
@@ -15,11 +16,14 @@ r2d2 = "0.8.10"
 r2d2_sqlite = "0.21.0"
 rusqlite = { version = "0.28.0", features = ["bundled", "chrono", "serde_json", "uuid"] }
 rusqlite_migration = "1.0.0"
+rust-argon2 = "1.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0.85"
 strum = { version = "0.24", features = ["derive"] }
+thiserror = "1.0.35"
 tokio = { version = "1.21.0", features = ["full"] }
-tower-http = { version = "0.3.4", features = ["cors", "tracing", "trace"] }
+tower-http = { version = "0.3.4", features = ["cors", "tracing", "trace", "catch-panic"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.15", features = ["env-filter"] }
+utoipa = { version = "2.1.0", features = ["default", "json", "chrono", "axum_extras"] }
 uuid = "1.1.2"

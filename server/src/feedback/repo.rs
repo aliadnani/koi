@@ -1,7 +1,7 @@
 use std::{str::FromStr, sync::Arc};
 
 use async_trait::async_trait;
-use chrono::{Utc};
+use chrono::Utc;
 use eyre::Result;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -19,6 +19,8 @@ pub trait FeedbackRepository {
     async fn create_feedback(&self, new_feedback: &NewFeedback) -> Result<Feedback>;
 
     async fn get_feedback(&self, id: &String) -> Result<Option<Feedback>>;
+
+    async fn list_feedback_for_project(&self, project_id: &String) -> Result<Vec<Feedback>>;
 }
 
 pub struct FeedbackRepositorySqlite {
@@ -60,7 +62,7 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
                 &feedback.category.to_string(),
                 serde_json::to_string(&feedback.metadata).unwrap(),
                 serde_json::to_string(&feedback.additional_attributes).unwrap(),
-                &feedback.project_id
+                &feedback.project_id,
             ),
         )?;
 
@@ -84,18 +86,69 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
                         description: row.get(1)?,
                         location: row.get(2)?,
                         status: {
-                            let status: String = row.get(3)?; FeedbackStatus::from_str(&status).unwrap()
+                            let status: String = row.get(3)?;
+                            FeedbackStatus::from_str(&status).unwrap()
                         },
                         category: {
-                            let category: String = row.get(4)?; FeedbackCategory::from_str(&category).unwrap()
+                            let category: String = row.get(4)?;
+                            FeedbackCategory::from_str(&category).unwrap()
                         },
-                        metadata: {let metadata: String = row.get(5)?;serde_json::from_str(&metadata).unwrap()},
-                        additional_attributes: {let additional_attributes: String = row.get(6)?;serde_json::from_str(&additional_attributes).unwrap()},
-                        project_id: row.get(7)?
+                        metadata: {
+                            let metadata: String = row.get(5)?;
+                            serde_json::from_str(&metadata).unwrap()
+                        },
+                        additional_attributes: {
+                            let additional_attributes: String = row.get(6)?;
+                            serde_json::from_str(&additional_attributes).unwrap()
+                        },
+                        project_id: row.get(7)?,
                     })
                 },
             )
             .optional()?;
+
+        Ok(feedback)
+    }
+
+    async fn list_feedback_for_project(&self, project_id: &String) -> Result<Vec<Feedback>> {
+        let feedback: Vec<Feedback> = self
+            .conn
+            .get()?
+            .prepare_cached(
+        "
+            SELECT id, description, location, status, category, metadata, additional_attributes, project_id
+            FROM feedback
+            WHERE project_id = ?1;
+            "
+             )
+            .unwrap()
+            .query_map([project_id], |row| {
+                Ok(Feedback {
+                    id: row.get(0)?,
+                    description: row.get(1)?,
+                    location: row.get(2)?,
+                    status: {
+                        let status: String = row.get(3)?;
+                        FeedbackStatus::from_str(&status).unwrap()
+                    },
+                    category: {
+                        let category: String = row.get(4)?;
+                        FeedbackCategory::from_str(&category).unwrap()
+                    },
+                    metadata: {
+                        let metadata: String = row.get(5)?;
+                        serde_json::from_str(&metadata).unwrap()
+                    },
+                    additional_attributes: {
+                        let additional_attributes: String = row.get(6)?;
+                        serde_json::from_str(&additional_attributes).unwrap()
+                    },
+                    project_id: row.get(7)?,
+                })
+            })
+            .unwrap()
+            .map(|f| f.unwrap())
+            .collect();
 
         Ok(feedback)
     }
