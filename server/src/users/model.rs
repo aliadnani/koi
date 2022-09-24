@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use utoipa::{IntoParams, ToSchema};
 
 use crate::project::model::Project;
 
@@ -34,7 +34,7 @@ pub struct NewUserProfile {
     pub password: String,
 }
 
-#[derive(Debug, Deserialize, Clone, ToSchema)]
+#[derive(Debug, Deserialize, Clone, ToSchema, IntoParams)]
 pub struct UserProjectAdditionRemoval {
     pub email: String,
 }

@@ -20,6 +20,15 @@ impl FeedbackService {
     }
 }
 
+#[utoipa::path(
+    post,
+    path = "/feedback",
+    request_body = NewFeedback,
+    responses(
+        (status = 200, description = "User added to project succesfully", body = Feedback),
+    ),
+    tag = "Feedback API",
+)]
 // TODO: Check project_id constraint
 async fn create_feedback(
     Json(new_feedback): Json<NewFeedback>,

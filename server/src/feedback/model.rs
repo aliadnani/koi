@@ -5,20 +5,20 @@ use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 use utoipa::ToSchema;
 
-#[derive(EnumString, Display, Deserialize, Serialize, Clone)]
+#[derive(EnumString, Display, Deserialize, Serialize, Clone, ToSchema)]
 pub enum FeedbackCategory {
     Idea,
     Issue,
     Other,
 }
 
-#[derive(EnumString, Display, Deserialize, Serialize)]
+#[derive(EnumString, Display, Deserialize, Serialize, ToSchema)]
 pub enum FeedbackStatus {
     Default,
     Archived,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, ToSchema)]
 pub struct FeedbackMetadata {
     pub created_at: DateTime<Utc>,
     pub device: String,

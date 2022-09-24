@@ -56,6 +56,15 @@ impl ProjectService {
     }
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects",
+    request_body = NewProject,
+    responses(
+        (status = 200, description = "Project created succesfully", body = Project),
+    ),
+    tag = "Project API",
+)]
 async fn create_project(
     Json(new_project): Json<NewProject>,
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
@@ -74,6 +83,17 @@ async fn create_project(
     (StatusCode::OK, Json(project.clone())).into_response()
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}",
+    params(
+        ("project_id" = String, Path, description = "Project ID")
+    ),
+    responses(
+        (status = 200, description = "Project retrived succesfully", body = Project),
+    ),
+    tag = "Project API",
+)]
 async fn get_project(
     Path(project_id): Path<String>,
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
@@ -84,8 +104,8 @@ async fn get_project(
         .await
         .unwrap()
     {
-        true => return (StatusCode::FORBIDDEN).into_response(),
-        false => (),
+        false => return (StatusCode::FORBIDDEN).into_response(),
+        true => (),
     }
 
     match project_repo.get_project(project_id.clone()).await.unwrap() {
@@ -94,6 +114,17 @@ async fn get_project(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/feedback",
+    params(
+        ("project_id" = String, Path, description = "Project ID")
+    ),
+    responses(
+        (status = 200, description = "Feedback for project retrived succesfully", body = [Feedback]),
+    ),
+    tag = "Project API",
+)]
 async fn get_project_feedback(
     Path(project_id): Path<String>,
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
@@ -122,6 +153,18 @@ async fn get_project_feedback(
     (StatusCode::OK, Json(feedback)).into_response()
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects/{project_id}/users",
+    request_body = UserProjectAdditionRemoval,
+    params(
+        ("project_id" = String, Path, description = "Project ID")
+    ),
+    responses(
+        (status = 204, description = "User added to project succesfully"),
+    ),
+    tag = "Project API",
+)]
 async fn add_user_to_project(
     Path(project_id): Path<String>,
     Json(user_project_addition): Json<UserProjectAdditionRemoval>,
@@ -163,6 +206,18 @@ async fn add_user_to_project(
     feedback
 }
 
+#[utoipa::path(
+    delete,
+    path = "/projects/{project_id}/users",
+    params(
+        UserProjectAdditionRemoval,
+        ("project_id" = String, Path, description = "Project ID")
+    ),
+    responses(
+        (status = 204, description = "User removed from project succesfully"),
+    ),
+    tag = "Project API",
+)]
 async fn remove_user_from_project(
     Path(project_id): Path<String>,
     Query(user_project_removal): Query<UserProjectAdditionRemoval>,
@@ -195,6 +250,17 @@ async fn remove_user_from_project(
     feedback
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/users",
+    params(
+        ("project_id" = String, Path, description = "Project ID")
+    ),
+    responses(
+        (status = 200, description = "Retrieved users of project succesfully", body = [UserProfile]),
+    ),
+    tag = "Project API",
+)]
 async fn list_users_of_project(
     Path(project_id): Path<String>,
     Extension(project_repo): Extension<ProjectRepositoryDyn>,

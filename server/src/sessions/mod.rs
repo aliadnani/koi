@@ -20,7 +20,10 @@ pub struct Session {
 
 impl Session {
     pub fn new(token: String, user_profile: UserProfile) -> Session {
-        Session { token, user_profile }
+        Session {
+            token,
+            user_profile,
+        }
     }
 }
 

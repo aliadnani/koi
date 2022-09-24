@@ -7,7 +7,7 @@ use axum::{
 
 use crate::{
     http::auth::{AuthBasic, AuthBearer},
-    sessions::{SessionRepositoryDyn, Session},
+    sessions::{Session, SessionRepositoryDyn},
 };
 
 use super::{model::NewUserProfile, repo::UserRepositoryDyn};
@@ -42,7 +42,7 @@ impl UserService {
     responses(
         (status = 200, description = "Account registered succesfully", body = UserProfile),
     ),
-    tag = "Profile",
+    tag = "Profile API",
     security(
         ()
     )
@@ -54,7 +54,10 @@ async fn register(
     Extension(session_repo): Extension<SessionRepositoryDyn>,
 ) -> impl IntoResponse {
     let profile = user_repo.create_profile(new_profile).await.unwrap();
-    let token = session_repo.create_session(profile.clone().email).await.unwrap();
+    let token = session_repo
+        .create_session(profile.clone().email)
+        .await
+        .unwrap();
 
     let session = Session::new(token, profile);
 
@@ -70,7 +73,7 @@ async fn register(
     security(
         ("Username & Password" = [])
     ),
-    tag = "Profile"
+    tag = "Profile API"
 )]
 async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     (StatusCode::OK, Json(token)).into_response()
@@ -85,7 +88,7 @@ async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     security(
         ("Session Token" = [])
     ),
-    tag = "Profile"
+    tag = "Profile API"
 )]
 async fn get_profile(
     AuthBearer(user_profile): AuthBearer,
