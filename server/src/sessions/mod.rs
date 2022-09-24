@@ -8,10 +8,11 @@ use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::OptionalExtension;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use crate::{common::ALPHANUMERIC, users::model::UserProfile};
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct Session {
     pub token: String,
     pub user_profile: UserProfile,

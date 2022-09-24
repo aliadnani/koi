@@ -6,10 +6,14 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::{
     feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
+    openapi::ApiDoc,
     project::{repo::ProjectRepositorySqlite, service::ProjectService},
     sessions::SessionRepositorySqlite,
     users::{repo::UserRepositorySqlite, service::UserService},
 };
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
+
 
 mod common;
 mod db;
@@ -80,7 +84,8 @@ async fn main() {
         .merge(profile_service.routes())
         .merge(feedback_service.routes())
         .layer(TraceLayer::new_for_http())
-        .layer(CatchPanicLayer::new());
+        .layer(CatchPanicLayer::new())
+        .merge(SwaggerUi::new("/swagger-ui/*tail").url("/api-doc/openapi.json", ApiDoc::openapi()));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 6122));
     tracing::debug!("Server started on {}!", addr);

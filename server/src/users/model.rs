@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use crate::project::model::Project;
 
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct UserProfile {
     pub id: String,
     pub name: String,
@@ -11,7 +12,7 @@ pub struct UserProfile {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, ToSchema)]
 pub struct UserProfileWithProjects {
     pub user_profile: UserProfile,
     pub projects: Vec<Project>,
@@ -26,14 +27,14 @@ impl UserProfile {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, ToSchema)]
 pub struct NewUserProfile {
     pub name: String,
     pub email: String,
     pub password: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, ToSchema)]
 pub struct UserProjectAdditionRemoval {
     pub email: String,
 }
