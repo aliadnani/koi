@@ -45,7 +45,7 @@ async fn create_profile(
 }
 
 async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
-    (StatusCode::OK, token).into_response()
+    (StatusCode::OK, Json(token)).into_response()
 }
 
 async fn get_profile(
@@ -56,8 +56,6 @@ async fn get_profile(
         .get_projects_of_user(user_profile.id.clone())
         .await
         .unwrap();
-
-    // let user_profile_with_projects = 
 
     (StatusCode::OK, Json(user_profile.with_projects(projects))).into_response()
 }

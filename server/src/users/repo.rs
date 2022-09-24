@@ -17,8 +17,11 @@ pub type UserRepositoryDyn = Arc<dyn UserRepository + Send + Sync>;
 #[async_trait]
 pub trait UserRepository {
     async fn create_profile(&self, new_profile: &NewUserProfile) -> Result<UserProfile>;
-    async fn validate_profile_credentials(&self, email: String, password: String)
-        -> Result<bool>;
+    async fn validate_profile_credentials(
+        &self,
+        email: String,
+        password: String,
+    ) -> Result<Option<UserProfile>>;
     async fn get_profile(&self, user_id: String) -> Result<Option<UserProfile>>;
     async fn get_projects_of_user(&self, user_id: String) -> Result<Vec<Project>>;
     async fn get_profile_by_email(&self, email: String) -> Result<Option<UserProfile>>;
@@ -73,24 +76,41 @@ impl UserRepository for UserRepositorySqlite {
         &self,
         email: String,
         password: String,
-    ) -> Result<bool> {
-        let password_hash_and_salt_option: Option<(String, String)> = self
+    ) -> Result<Option<UserProfile>> {
+        let profile_and_hash: Option<(UserProfile, String)> = self
             .conn
             .get()?
             .query_row(
-                "SELECT password_hash, password_salt FROM users WHERE email = ?1",
+                "SELECT id, name, email, created_at, password_hash FROM users WHERE email = ?1",
                 [&email],
-                |row| Ok((row.get(0).unwrap(), row.get(1).unwrap())),
+                |row| {
+                    Ok((
+                        UserProfile {
+                            id: row.get(0)?,
+                            name: row.get(1)?,
+                            email: row.get(2)?,
+                            created_at: {
+                                let date: String = row.get(3)?;
+                                DateTime::parse_from_rfc3339(&date)
+                                    .expect("Timezones in db should be rfc3339!")
+                                    .with_timezone(&Utc)
+                            },
+                        },
+                        row.get(4)?,
+                    ))
+                },
             )
             .optional()
             .unwrap();
 
-        match password_hash_and_salt_option {
-            Some((password_hash, _password_salt)) => {
-                let matches = argon2::verify_encoded(&password_hash, &password.as_bytes()).unwrap();
-                Ok(matches)
+        match profile_and_hash {
+            Some((user_profile, password_hash)) => {
+                match argon2::verify_encoded(&password_hash, &password.as_bytes()).unwrap() {
+                    true => Ok(Some(user_profile)),
+                    false => Ok(None),
+                }
             }
-            None => Ok(false),
+            None => Ok(None),
         }
     }
 

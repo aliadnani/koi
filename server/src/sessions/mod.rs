@@ -7,8 +7,15 @@ use nanoid::nanoid;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::OptionalExtension;
+use serde::Serialize;
 
-use crate::common::ALPHANUMERIC;
+use crate::{common::ALPHANUMERIC, users::model::UserProfile};
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub struct Session {
+    pub token: String,
+    pub user_profile: UserProfile,
+}
 
 pub type SessionRepositoryDyn = Arc<dyn SessionRepository + Send + Sync>;
 

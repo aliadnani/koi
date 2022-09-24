@@ -1,9 +1,5 @@
 use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Extension, Json, Router,
+    extract::Path, http::StatusCode, response::IntoResponse, routing::post, Extension, Json, Router,
 };
 
 use super::{model::NewFeedback, repo::FeedbackRepositoryDyn};

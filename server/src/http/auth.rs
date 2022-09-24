@@ -6,7 +6,7 @@ use axum::{
 };
 
 use crate::{
-    sessions::SessionRepositoryDyn,
+    sessions::{Session, SessionRepositoryDyn},
     users::{model::UserProfile, repo::UserRepositoryDyn},
 };
 
@@ -101,7 +101,7 @@ fn decode_basic(input: &str) -> Result<(String, String), (StatusCode, &'static s
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct AuthBasic(pub String);
+pub struct AuthBasic(pub Session);
 
 #[async_trait]
 impl<B> FromRequest<B> for AuthBasic
@@ -152,14 +152,21 @@ where
             Some(user) => user.email,
             None => return Err((StatusCode::NOT_FOUND, String::from("User does not exist!"))),
         };
-
+        // true => Ok(Self(session_repo.create_session(email.clone()).await.unwrap())),
+        // false => Err((StatusCode::FORBIDDEN, String::from("Wrong credentials!"))),
         match user_repo
             .validate_profile_credentials(email.clone(), password)
             .await
             .unwrap()
         {
-            true => Ok(Self(session_repo.create_session(email.clone()).await.unwrap())),
-            false => Err((StatusCode::FORBIDDEN, String::from("Wrong credentials!"))),
+            Some(user_profile) => {
+                let token = session_repo.create_session(email.clone()).await.unwrap();
+                Ok(Self(Session {
+                    token: token,
+                    user_profile,
+                }))
+            }
+            None => Err((StatusCode::FORBIDDEN, String::from("Wrong credentials!"))),
         }
     }
 }
