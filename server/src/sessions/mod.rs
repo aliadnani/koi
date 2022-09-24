@@ -15,9 +15,9 @@ pub type SessionRepositoryDyn = Arc<dyn SessionRepository + Send + Sync>;
 /// `SessionRepository` is abstracted to a trait to allow for using a seperate `SessionRepository` in tests
 #[async_trait]
 pub trait SessionRepository {
-    async fn verify_session(&self, token: &String) -> Result<Option<String>>;
-    async fn create_session(&self, user_email: &String) -> Result<String>;
-    async fn delete_session(&self, token: &String) -> Result<()>;
+    async fn verify_session(&self, token: String) -> Result<Option<String>>;
+    async fn create_session(&self, user_email: String) -> Result<String>;
+    async fn delete_session(&self, token: String) -> Result<()>;
 }
 
 pub struct SessionRepositorySqlite {
@@ -32,14 +32,14 @@ impl SessionRepositorySqlite {
 
 #[async_trait]
 impl SessionRepository for SessionRepositorySqlite {
-    async fn verify_session(&self, token: &String) -> Result<Option<String>> {
+    async fn verify_session(&self, token: String) -> Result<Option<String>> {
         let sesion_option: Option<(String, String)> = self
             .conn
             .get()
             .unwrap()
             .query_row(
                 "SELECT user_email, expires_at FROM user_sessions WHERE token = ?1",
-                [token],
+                [token.clone()],
                 |row| Ok((row.get(0)?, row.get(1)?)),
             )
             .optional()
@@ -52,7 +52,7 @@ impl SessionRepository for SessionRepositorySqlite {
                     .with_timezone(&Utc);
 
                 if expires_at.le(&Utc::now()) {
-                    self.delete_session(token).await.unwrap();
+                    self.delete_session(token.clone()).await.unwrap();
                     return Ok(None);
                 }
                 return Ok(Some(user_email));
@@ -61,7 +61,7 @@ impl SessionRepository for SessionRepositorySqlite {
         }
     }
 
-    async fn create_session(&self, user_email: &String) -> Result<String> {
+    async fn create_session(&self, user_email: String) -> Result<String> {
         let token = nanoid!(30, ALPHANUMERIC);
 
         self.conn
@@ -84,7 +84,7 @@ impl SessionRepository for SessionRepositorySqlite {
 
         Ok(token)
     }
-    async fn delete_session(&self, token: &String) -> Result<()> {
+    async fn delete_session(&self, token: String) -> Result<()> {
         self.conn
             .get()
             .unwrap()

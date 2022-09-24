@@ -18,9 +18,9 @@ pub type FeedbackRepositoryDyn = Arc<dyn FeedbackRepository + Send + Sync>;
 pub trait FeedbackRepository {
     async fn create_feedback(&self, new_feedback: &NewFeedback) -> Result<Feedback>;
 
-    async fn get_feedback(&self, id: &String) -> Result<Option<Feedback>>;
+    async fn get_feedback(&self, id: String) -> Result<Option<Feedback>>;
 
-    async fn list_feedback_for_project(&self, project_id: &String) -> Result<Vec<Feedback>>;
+    async fn list_feedback_for_project(&self, project_id: String) -> Result<Vec<Feedback>>;
 }
 
 pub struct FeedbackRepositorySqlite {
@@ -69,7 +69,7 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
         Ok(feedback)
     }
 
-    async fn get_feedback(&self, feedback_id: &String) -> Result<Option<Feedback>> {
+    async fn get_feedback(&self, feedback_id: String) -> Result<Option<Feedback>> {
         let feedback = self
             .conn
             .get()?
@@ -110,7 +110,7 @@ impl FeedbackRepository for FeedbackRepositorySqlite {
         Ok(feedback)
     }
 
-    async fn list_feedback_for_project(&self, project_id: &String) -> Result<Vec<Feedback>> {
+    async fn list_feedback_for_project(&self, project_id: String) -> Result<Vec<Feedback>> {
         let feedback: Vec<Feedback> = self
             .conn
             .get()?

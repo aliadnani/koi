@@ -33,25 +33,30 @@ async fn main() {
     // Initialize DB
     let manager = SqliteConnectionManager::file("koi.db");
     // let manager = SqliteConnectionManager::memory();
-    let pool = Arc::new(r2d2::Pool::new(manager).unwrap());
+
+    let pool = Arc::new(r2d2::Pool::new(manager).expect("Could not acquire SQLite pool."));
 
     pool.get()
-        .unwrap()
+        .expect("Could not get a connection from SQLite pool.")
         .pragma_update(None, "journal_mode", &"WAL")
         .expect("Failed to set journal mode to WAL");
 
     pool.get()
-        .unwrap()
+        .expect("Could not get a connection from SQLite pool.")
         .pragma_update(None, "foreign_keys", &"ON")
         .expect("Failed to enable strict mode");
 
     pool.get()
-        .unwrap()
+        .expect("Could not get a connection from SQLite pool.")
         .pragma_update(None, "strict", &"ON")
         .expect("Failed to enable foreign keys");
 
     db::sqlite::migrations()
-        .to_latest(&mut pool.get().unwrap())
+        .to_latest(
+            &mut pool
+                .get()
+                .expect("Could not get a connection from SQLite pool."),
+        )
         .expect("Failed to run migrations");
 
     // Initialize repos
@@ -82,5 +87,5 @@ async fn main() {
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
-        .unwrap();
+        .expect("Could not start server.");
 }

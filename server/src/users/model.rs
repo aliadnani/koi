@@ -13,20 +13,14 @@ pub struct UserProfile {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct UserProfileWithProjects {
-    pub id: String,
-    pub name: String,
-    pub email: String,
+    pub user_profile: UserProfile,
     pub projects: Vec<Project>,
-    pub created_at: DateTime<Utc>,
 }
 
 impl UserProfile {
     pub fn with_projects(&self, projects: Vec<Project>) -> UserProfileWithProjects {
         UserProfileWithProjects {
-            id: self.id.clone(),
-            name: self.name.clone(),
-            email: self.email.clone(),
-            created_at: self.created_at.clone(),
+            user_profile: self.clone(),
             projects,
         }
     }

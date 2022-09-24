@@ -20,22 +20,22 @@ pub type ProjectRepositoryDyn = Arc<dyn ProjectRepository + Send + Sync>;
 #[async_trait]
 pub trait ProjectRepository {
     async fn create_project(&self, new_project: &NewProject) -> Result<Project>;
-    async fn get_project(&self, id: &String) -> Result<Option<Project>>;
+    async fn get_project(&self, id: String) -> Result<Option<Project>>;
     async fn add_user_to_project(
         &self,
-        project_id: &String,
-        user_email: &String,
+        project_id: String,
+        user_email: String,
     ) -> Result<(), ProjectError>;
     async fn remove_user_from_project(
         &self,
-        project_id: &String,
-        user_email: &String,
+        project_id: String,
+        user_email: String,
     ) -> Result<(), ProjectError>;
-    async fn list_users_of_project(&self, project_id: &String) -> Result<Vec<UserProfile>>;
+    async fn list_users_of_project(&self, project_id: String) -> Result<Vec<UserProfile>>;
     async fn check_if_user_is_part_of_project(
         &self,
-        project_id: &String,
-        email: &String,
+        project_id: String,
+        email: String,
     ) -> Result<bool>;
 }
 
@@ -66,7 +66,7 @@ impl ProjectRepository for ProjectRepositorySqlite {
         Ok(project)
     }
 
-    async fn get_project(&self, project_id: &String) -> Result<Option<Project>> {
+    async fn get_project(&self, project_id: String) -> Result<Option<Project>> {
         let project = self
             .conn
             .get()?
@@ -94,8 +94,8 @@ impl ProjectRepository for ProjectRepositorySqlite {
     // TODO: Check project_id & user_id must exist constraint
     async fn add_user_to_project(
         &self,
-        project_id: &String,
-        user_email: &String,
+        project_id: String,
+        user_email: String,
     ) -> Result<(), ProjectError> {
         let user_id: String = match self
             .conn
@@ -119,7 +119,7 @@ impl ProjectRepository for ProjectRepositorySqlite {
             .map_err(|_| ProjectError::Unknown)?
             .query_row(
                 "SELECT id FROM projects WHERE id = ?1",
-                [project_id],
+                [&project_id],
                 |row| Ok(row.get(0)?),
             )
             .optional()
@@ -146,8 +146,8 @@ impl ProjectRepository for ProjectRepositorySqlite {
 
     async fn remove_user_from_project(
         &self,
-        project_id: &String,
-        user_email: &String,
+        project_id: String,
+        user_email: String,
     ) -> Result<(), ProjectError> {
         let user_id: String = match self
             .conn
@@ -171,7 +171,7 @@ impl ProjectRepository for ProjectRepositorySqlite {
             .map_err(|_| ProjectError::Unknown)?
             .query_row(
                 "SELECT id FROM projects WHERE id = ?1",
-                [project_id],
+                [&project_id],
                 |row| Ok(row.get(0)?),
             )
             .optional()
@@ -196,7 +196,7 @@ impl ProjectRepository for ProjectRepositorySqlite {
         };
     }
 
-    async fn list_users_of_project(&self, project_id: &String) -> Result<Vec<UserProfile>> {
+    async fn list_users_of_project(&self, project_id: String) -> Result<Vec<UserProfile>> {
         let profiles: Vec<UserProfile> = self
             .conn
             .get()?
@@ -231,8 +231,8 @@ impl ProjectRepository for ProjectRepositorySqlite {
 
     async fn check_if_user_is_part_of_project(
         &self,
-        project_id: &String,
-        email: &String,
+        project_id: String,
+        email: String,
     ) -> Result<bool> {
         let user_is_part_of_project = self
             .conn

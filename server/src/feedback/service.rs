@@ -38,7 +38,7 @@ async fn get_feedback(
     Path(feedback_id): Path<String>,
     Extension(repo): Extension<FeedbackRepositoryDyn>,
 ) -> impl IntoResponse {
-    match repo.get_feedback(&feedback_id).await.unwrap() {
+    match repo.get_feedback(feedback_id).await.unwrap() {
         Some(feedback) => (StatusCode::OK, Json(feedback)).into_response(),
         None => (StatusCode::NOT_FOUND).into_response(),
     }

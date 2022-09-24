@@ -56,7 +56,7 @@ where
         };
 
         let email = match session_repo
-            .verify_session(&String::from(token))
+            .verify_session(String::from(token))
             .await
             .unwrap()
         {
@@ -70,7 +70,7 @@ where
         };
 
         let user_profile = user_repo
-            .get_profile_by_email(&String::from(email))
+            .get_profile_by_email(String::from(email))
             .await
             .unwrap();
 
@@ -145,7 +145,7 @@ where
         };
 
         let email = match user_repo
-            .get_profile_by_email(&String::from(email))
+            .get_profile_by_email(String::from(email))
             .await
             .unwrap()
         {
@@ -154,11 +154,11 @@ where
         };
 
         match user_repo
-            .validate_profile_credentials(&email, &password)
+            .validate_profile_credentials(email.clone(), password)
             .await
             .unwrap()
         {
-            true => Ok(Self(session_repo.create_session(&email).await.unwrap())),
+            true => Ok(Self(session_repo.create_session(email.clone()).await.unwrap())),
             false => Err((StatusCode::FORBIDDEN, String::from("Wrong credentials!"))),
         }
     }

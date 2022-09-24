@@ -17,11 +17,11 @@ pub type UserRepositoryDyn = Arc<dyn UserRepository + Send + Sync>;
 #[async_trait]
 pub trait UserRepository {
     async fn create_profile(&self, new_profile: &NewUserProfile) -> Result<UserProfile>;
-    async fn validate_profile_credentials(&self, email: &String, password: &String)
+    async fn validate_profile_credentials(&self, email: String, password: String)
         -> Result<bool>;
-    async fn get_profile(&self, user_id: &String) -> Result<Option<UserProfile>>;
-    async fn get_projects_of_user(&self, user_id: &String) -> Result<Vec<Project>>;
-    async fn get_profile_by_email(&self, email: &String) -> Result<Option<UserProfile>>;
+    async fn get_profile(&self, user_id: String) -> Result<Option<UserProfile>>;
+    async fn get_projects_of_user(&self, user_id: String) -> Result<Vec<Project>>;
+    async fn get_profile_by_email(&self, email: String) -> Result<Option<UserProfile>>;
 }
 
 pub struct UserRepositorySqlite {
@@ -71,8 +71,8 @@ impl UserRepository for UserRepositorySqlite {
     }
     async fn validate_profile_credentials(
         &self,
-        email: &String,
-        password: &String,
+        email: String,
+        password: String,
     ) -> Result<bool> {
         let password_hash_and_salt_option: Option<(String, String)> = self
             .conn
@@ -94,7 +94,7 @@ impl UserRepository for UserRepositorySqlite {
         }
     }
 
-    async fn get_profile(&self, user_id: &String) -> Result<Option<UserProfile>> {
+    async fn get_profile(&self, user_id: String) -> Result<Option<UserProfile>> {
         let profile = self
             .conn
             .get()?
@@ -120,7 +120,7 @@ impl UserRepository for UserRepositorySqlite {
         Ok(profile)
     }
 
-    async fn get_projects_of_user(&self, user_id: &String) -> Result<Vec<Project>> {
+    async fn get_projects_of_user(&self, user_id: String) -> Result<Vec<Project>> {
         let projects: Vec<Project> = self
             .conn
             .get()?
@@ -152,7 +152,7 @@ impl UserRepository for UserRepositorySqlite {
         Ok(projects)
     }
 
-    async fn get_profile_by_email(&self, email: &String) -> Result<Option<UserProfile>> {
+    async fn get_profile_by_email(&self, email: String) -> Result<Option<UserProfile>> {
         let profile = self
             .conn
             .get()?

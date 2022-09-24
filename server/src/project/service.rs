@@ -64,14 +64,14 @@ async fn create_project(
     let project = project_repo.create_project(&new_project).await.unwrap();
 
     match project_repo
-        .add_user_to_project(&project.id, &user_profile.email)
+        .add_user_to_project(project.id.clone(), user_profile.email)
         .await
     {
         Ok(_) => (),
         Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     }
 
-    (StatusCode::OK, Json(project)).into_response()
+    (StatusCode::OK, Json(project.clone())).into_response()
 }
 
 async fn get_project(
@@ -80,7 +80,7 @@ async fn get_project(
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
     match project_repo
-        .check_if_user_is_part_of_project(&project_id, &user_profile.email)
+        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
         .await
         .unwrap()
     {
@@ -88,7 +88,7 @@ async fn get_project(
         false => (),
     }
 
-    match project_repo.get_project(&project_id).await.unwrap() {
+    match project_repo.get_project(project_id.clone()).await.unwrap() {
         Some(project) => (StatusCode::OK, Json(project)).into_response(),
         None => (StatusCode::NOT_FOUND).into_response(),
     }
@@ -101,7 +101,7 @@ async fn get_project_feedback(
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
     match project_repo
-        .check_if_user_is_part_of_project(&project_id, &user_profile.email)
+        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
         .await
         .unwrap()
     {
@@ -109,13 +109,13 @@ async fn get_project_feedback(
         false => return (StatusCode::FORBIDDEN).into_response(),
     }
 
-    let _project_exists = match project_repo.get_project(&project_id).await.unwrap() {
+    let _project_exists = match project_repo.get_project(project_id.clone()).await.unwrap() {
         Some(project) => project,
         None => return (StatusCode::NOT_FOUND).into_response(),
     };
 
     let feedback = feedback_repo
-        .list_feedback_for_project(&project_id)
+        .list_feedback_for_project(project_id.clone())
         .await
         .unwrap();
 
@@ -129,7 +129,7 @@ async fn add_user_to_project(
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
     match project_repo
-        .check_if_user_is_part_of_project(&project_id, &user_profile.email)
+        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
         .await
         .unwrap()
     {
@@ -138,7 +138,7 @@ async fn add_user_to_project(
     }
 
     let feedback = match project_repo
-        .add_user_to_project(&project_id, &user_project_addition.email)
+        .add_user_to_project(project_id.clone(), user_project_addition.email)
         .await
     {
         Ok(_) => (StatusCode::NO_CONTENT).into_response(),
@@ -170,7 +170,7 @@ async fn remove_user_from_project(
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
     match project_repo
-        .check_if_user_is_part_of_project(&project_id, &user_profile.email)
+        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
         .await
         .unwrap()
     {
@@ -179,7 +179,7 @@ async fn remove_user_from_project(
     }
 
     let feedback = match project_repo
-        .remove_user_from_project(&project_id, &user_project_removal.email)
+        .remove_user_from_project(project_id.clone(), user_project_removal.email)
         .await
     {
         Ok(_) => (StatusCode::NO_CONTENT).into_response(),
@@ -199,12 +199,12 @@ async fn list_users_of_project(
     Path(project_id): Path<String>,
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
 ) -> impl IntoResponse {
-    let _project_exists = match project_repo.get_project(&project_id).await.unwrap() {
+    let _project_exists = match project_repo.get_project(project_id.clone()).await.unwrap() {
         Some(project) => project,
         None => return (StatusCode::NOT_FOUND).into_response(),
     };
 
-    let users = match project_repo.list_users_of_project(&project_id).await {
+    let users = match project_repo.list_users_of_project(project_id.clone()).await {
         Ok(users) => (StatusCode::OK, Json(users)).into_response(),
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     };

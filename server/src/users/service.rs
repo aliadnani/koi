@@ -53,9 +53,11 @@ async fn get_profile(
     Extension(user_repo): Extension<UserRepositoryDyn>,
 ) -> impl IntoResponse {
     let projects = user_repo
-        .get_projects_of_user(&user_profile.id)
+        .get_projects_of_user(user_profile.id.clone())
         .await
         .unwrap();
+
+    // let user_profile_with_projects = 
 
     (StatusCode::OK, Json(user_profile.with_projects(projects))).into_response()
 }
