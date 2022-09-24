@@ -35,10 +35,6 @@ impl UserService {
     }
 }
 
-
-
-
-
 #[utoipa::path(
     post,
     path = "/register",
@@ -61,11 +57,6 @@ async fn register(
     (StatusCode::OK, Json(profile)).into_response()
 }
 
-
-
-
-
-
 #[utoipa::path(
     get,
     path = "/login",
@@ -80,10 +71,6 @@ async fn register(
 async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     (StatusCode::OK, Json(token)).into_response()
 }
-
-
-
-
 
 #[utoipa::path(
     get,

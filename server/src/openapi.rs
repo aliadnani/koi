@@ -42,7 +42,10 @@ impl Modify for SecurityAddon {
             components.add_security_scheme(
                 "Session Token",
                 SecurityScheme::Http(
-                    HttpBuilder::new().scheme(HttpAuthScheme::Bearer).bearer_format("Opaque").build()
+                    HttpBuilder::new()
+                        .scheme(HttpAuthScheme::Bearer)
+                        .bearer_format("Opaque")
+                        .build(),
                 ),
             );
         }

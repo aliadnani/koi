@@ -14,7 +14,6 @@ use crate::{
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-
 mod common;
 mod db;
 mod feedback;
