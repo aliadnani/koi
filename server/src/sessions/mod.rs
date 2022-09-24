@@ -18,6 +18,12 @@ pub struct Session {
     pub user_profile: UserProfile,
 }
 
+impl Session {
+    pub fn new(token: String, user_profile: UserProfile) -> Session {
+        Session { token, user_profile }
+    }
+}
+
 pub type SessionRepositoryDyn = Arc<dyn SessionRepository + Send + Sync>;
 
 /// `SessionRepository` is abstracted to a trait to allow for using a seperate `SessionRepository` in tests

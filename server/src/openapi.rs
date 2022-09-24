@@ -25,7 +25,7 @@ use crate::users;
     ),
     modifiers(&SecurityAddon),
     tags(
-        (name = "USER PROFILE", description = "API for managing your own profile")
+        (name = "Profile", description = "API for managing your own profile")
     )
 )]
 pub struct ApiDoc;

@@ -21,7 +21,6 @@ pub fn migrations() -> Migrations<'static> {
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT UNIQUE NOT NULL,
-            password_salt TEXT UNIQUE NOT NULL,
             created_at TEXT NOT NULL
         );
         CREATE INDEX users_idx ON users (id, email);
@@ -62,7 +61,7 @@ pub fn migrations() -> Migrations<'static> {
             r#"
         CREATE TABLE user_sessions (
             token TEXT PRIMARY KEY UNIQUE,
-            user_email TEXT UNIQUE,
+            user_email TEXT NOT NULL,
             expires_at TEXT NOT NULL
         );
         "#,

@@ -16,7 +16,7 @@ pub type UserRepositoryDyn = Arc<dyn UserRepository + Send + Sync>;
 /// `UserRepository` is abstracted to a trait to allow for using a seperate `UserRepository` in tests
 #[async_trait]
 pub trait UserRepository {
-    async fn create_profile(&self, new_profile: &NewUserProfile) -> Result<UserProfile>;
+    async fn create_profile(&self, new_profile: NewUserProfile) -> Result<UserProfile>;
     async fn validate_profile_credentials(
         &self,
         email: String,
@@ -39,11 +39,11 @@ impl UserRepositorySqlite {
 
 #[async_trait]
 impl UserRepository for UserRepositorySqlite {
-    async fn create_profile(&self, new_profile: &NewUserProfile) -> Result<UserProfile> {
+    async fn create_profile(&self, new_profile: NewUserProfile) -> Result<UserProfile> {
         let password_salt = nanoid::nanoid!(20);
 
         let password_hash = argon2::hash_encoded(
-            new_profile.password.clone().as_bytes(),
+            new_profile.password.as_bytes(),
             password_salt.as_bytes(),
             &argon2::Config::default(),
         )
@@ -58,14 +58,13 @@ impl UserRepository for UserRepositorySqlite {
 
         let _created = self.conn.get()?.execute(
             "
-            INSERT INTO users (id, name, email, password_hash, password_salt, created_at)
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6);",
+            INSERT INTO users (id, name, email, password_hash, created_at)
+            VALUES (?1, ?2, ?3, ?4, ?5);",
             (
                 &profile.id,
                 &profile.name,
                 &profile.email,
                 &password_hash,
-                &password_salt,
                 &profile.created_at.to_rfc3339(),
             ),
         )?;

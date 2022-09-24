@@ -7,7 +7,7 @@ use axum::{
 
 use crate::{
     http::auth::{AuthBasic, AuthBearer},
-    sessions::SessionRepositoryDyn,
+    sessions::{SessionRepositoryDyn, Session},
 };
 
 use super::{model::NewUserProfile, repo::UserRepositoryDyn};
@@ -38,11 +38,11 @@ impl UserService {
 #[utoipa::path(
     post,
     path = "/register",
-    request_body = UserProfile,
+    request_body = NewUserProfile,
     responses(
         (status = 200, description = "Account registered succesfully", body = UserProfile),
     ),
-    tag = "USER PROFILE",
+    tag = "Profile",
     security(
         ()
     )
@@ -51,14 +51,18 @@ impl UserService {
 async fn register(
     Json(new_profile): Json<NewUserProfile>,
     Extension(user_repo): Extension<UserRepositoryDyn>,
+    Extension(session_repo): Extension<SessionRepositoryDyn>,
 ) -> impl IntoResponse {
-    let profile = user_repo.create_profile(&new_profile).await.unwrap();
+    let profile = user_repo.create_profile(new_profile).await.unwrap();
+    let token = session_repo.create_session(profile.clone().email).await.unwrap();
 
-    (StatusCode::OK, Json(profile)).into_response()
+    let session = Session::new(token, profile);
+
+    (StatusCode::OK, Json(session)).into_response()
 }
 
 #[utoipa::path(
-    get,
+    post,
     path = "/login",
     responses(
         (status = 200, description = "Logged in successfully", body = Session)
@@ -66,7 +70,7 @@ async fn register(
     security(
         ("Username & Password" = [])
     ),
-    tag = "USER PROFILE"
+    tag = "Profile"
 )]
 async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     (StatusCode::OK, Json(token)).into_response()
@@ -81,7 +85,7 @@ async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     security(
         ("Session Token" = [])
     ),
-    tag = "USER PROFILE"
+    tag = "Profile"
 )]
 async fn get_profile(
     AuthBearer(user_profile): AuthBearer,
