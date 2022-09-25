@@ -14,7 +14,7 @@ async function createProject(
 ): Promise<Project> {
   const requestBody: NewProjectApi = snakeCaseObject({ name: projectName });
 
-  const response = await ky.post(`${Globals.baseUrl}/projects`, {
+  const response = await ky.post(`${Globals.apiBaseUrl}/projects`, {
     json: requestBody,
     headers: { Authorization: bearerAuthHeader(token) },
   });
@@ -29,7 +29,7 @@ async function getProjectFeedback(
   token: string
 ): Promise<Feedback[]> {
   const response = await ky.get(
-    `${Globals.baseUrl}/projects/${projectId}/feedback`,
+    `${Globals.apiBaseUrl}/projects/${projectId}/feedback`,
     {
       headers: { Authorization: bearerAuthHeader(token) },
     }

@@ -1,6 +1,6 @@
 import { Code, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 
-function FeedbackInfoBlock(props: { baseUrl: string; projectId: string }) {
+function FeedbackInfoBlock(props: { apiBaseUrl: string; projectId: string }) {
   return (
     <Text>
       Welcome to Koi!
@@ -19,7 +19,7 @@ function FeedbackInfoBlock(props: { baseUrl: string; projectId: string }) {
       <br />
       <br />
       <Code borderRadius={8} p={2} display="block" whiteSpace="pre">
-        {`curl -X 'POST' '${props.baseUrl}/feedback' \\
+        {`curl -X 'POST' '${props.apiBaseUrl}/feedback' \\
   -H 'Accept: application/json' \\
   -H 'Content-Type: application/json' \\
   -d '{

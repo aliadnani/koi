@@ -14,14 +14,14 @@ async function registerAccount(
     password,
   });
 
-  const response = await ky.post(`${Globals.baseUrl}/register`, {
+  const response = await ky.post(`${Globals.apiBaseUrl}/register`, {
     json: requestBody,
   });
   return await response.json();
 }
 
 async function logIn(email: string, password: string): Promise<SessionApi> {
-  const response = await ky.post(`${Globals.baseUrl}/login`, {
+  const response = await ky.post(`${Globals.apiBaseUrl}/login`, {
     headers: { Authorization: basicAuthHeader(email, password) },
   });
 

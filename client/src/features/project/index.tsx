@@ -59,7 +59,7 @@ function ProjectPage() {
           <Stack as={Box} spacing={{ base: 4, md: 8 }} py={{ base: 8, md: 8 }}>
             <Header />
             <FeedbackInfoBlock
-              baseUrl={Globals.baseUrl}
+              apiBaseUrl={Globals.apiBaseUrl}
               projectId={selectedProjectId as string}
             />
             <FeedbackTable feedbackItems={feedbackItems ?? []}></FeedbackTable>
