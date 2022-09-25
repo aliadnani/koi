@@ -1,7 +1,11 @@
-use axum::{Router, http::Method};
+use axum::{http::Method, Router};
 use r2d2_sqlite::SqliteConnectionManager;
 use std::{net::SocketAddr, sync::Arc};
-use tower_http::{catch_panic::CatchPanicLayer, trace::TraceLayer, cors::{CorsLayer, Any}};
+use tower_http::{
+    catch_panic::CatchPanicLayer,
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::{
@@ -86,15 +90,10 @@ async fn main() {
         .layer(CatchPanicLayer::new())
         .merge(SwaggerUi::new("/swagger-ui/*tail").url("/api-doc/openapi.json", ApiDoc::openapi()))
         .layer(
-            // see https://docs.rs/tower-http/latest/tower_http/cors/index.html
-            // for more details
-            //
-            // pay attention that for some request types like posting content-type: application/json
-            // it is required to add ".allow_headers([http::header::CONTENT_TYPE])"
-            // or see this issue https://github.com/tokio-rs/axum/issues/849
             CorsLayer::new()
                 .allow_origin(Any)
-                .allow_methods(Any).allow_headers(Any),
+                .allow_methods(Any)
+                .allow_headers(Any),
         );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 6122));

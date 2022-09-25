@@ -22,8 +22,6 @@ async function createProject(
   return camelCaseObject(await response.json());
 }
 
-
-
 async function getProjectFeedback(
   projectId: string,
   token: string
@@ -39,6 +37,5 @@ async function getProjectFeedback(
 
   return feedbackArr.map((f) => camelCaseObject(f));
 }
-
 
 export { createProject, getProjectFeedback };

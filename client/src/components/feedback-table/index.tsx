@@ -121,7 +121,9 @@ function FeedbackTable(props: FeedbackTableProps) {
                     <Code>{fi.metadata.device}</Code>
                   </ListItem>
                 </UnorderedList>
-                <Button disabled float="right" my={2}>Archive (WIP)</Button>
+                <Button disabled float="right" my={2}>
+                  Archive (WIP)
+                </Button>
               </Box>
             </AccordionPanel>
           </AccordionItem>
