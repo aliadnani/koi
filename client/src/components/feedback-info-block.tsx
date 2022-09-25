@@ -18,7 +18,7 @@ function FeedbackInfoBlock(props: { apiBaseUrl: string; projectId: string }) {
       manually via API request:
       <br />
       <br />
-      <Code borderRadius={8} p={2} display="block" whiteSpace="pre">
+      <Code borderRadius={8} p={2} overflow="scroll" display="block" whiteSpace="pre">
         {`curl -X 'POST' '${props.apiBaseUrl}/feedback' \\
   -H 'Accept: application/json' \\
   -H 'Content-Type: application/json' \\
