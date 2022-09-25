@@ -1,49 +1,30 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
-import { FeedbackTable } from "./features/dashboard/feedback-table";
-import { ProjectSelector } from "./features/dashboard/project-selector";
+import { Box } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { LandingPage } from "./screens/landing/landing";
+import { ProjectPage } from "./screens/project";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/app",
+    element: <ProjectPage />,
+  },
+]);
 
 function Koi(): JSX.Element {
+  const queryClient = new QueryClient();
+
   return (
-    <Box maxW="1200px" margin="0 auto">
-      <Box textAlign="center" className="koi-info" padding="1rem">
-        <Text>Koi - a no-frills feedback platform</Text>
-      </Box>
-      <Box textAlign="center" className="feedback-overview">
-        <Heading>Feedback!</Heading>
-        <ProjectSelector
-          projects={[
-            { id: "1", name: "project1" },
-            { id: "2", name: "project2" },
-            { id: "3", name: "project3" },
-          ]}
-          selectedProjectId={"2"}
-        ></ProjectSelector>
-        <FeedbackTable
-          feedbackItems={[
-            {
-              id: "34g1g1h",
-              content: "This is test number 1!",
-              createdAt: "",
-              metadata: {},
-              type: "issue",
-            },
-            {
-              id: "W34HE3Q1H",
-              content: "Hi can you please do ...",
-              createdAt: "",
-              metadata: {},
-              type: "idea",
-            },
-            {
-              id: "32Yqe",
-              content: "IDK what i want lol",
-              createdAt: "",
-              metadata: {},
-              type: "other",
-            },
-          ]}
-        ></FeedbackTable>
-      </Box>
+    <Box>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </Box>
   );
 }
