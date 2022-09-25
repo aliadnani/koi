@@ -68,9 +68,9 @@ function LandingPage() {
               <br />
               Made with <Code>React</Code>, <Code>Rust</Code> &{" "}
               <Code>SQLite</Code>
+              {/* <br />
               <br />
-              <br />
-              Backed by <Code>litestream</Code> and hosted an a Hetzner VPS
+              Backed by <Code>litestream</Code> and hosted an a Hetzner VPS */}
             </Text>
             <Link isExternal href="https://github.com/aliadnani/koi">
               https://github.com/aliadnani/koi
