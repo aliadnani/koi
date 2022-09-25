@@ -1,4 +1,5 @@
 import type { CamelCasedPropertiesDeep } from "type-fest";
+import { ProjectApi } from "./project";
 
 export type UserProfile = CamelCasedPropertiesDeep<UserProfileApi>;
 export interface UserProfileApi {
@@ -6,6 +7,7 @@ export interface UserProfileApi {
   name: string;
   email: string;
   created_at: string;
+  projects: ProjectApi[];
 }
 
 export type NewUserProfile = CamelCasedPropertiesDeep<NewUserProfileApi>;

@@ -150,7 +150,7 @@ where
             .unwrap()
         {
             Some(user) => user.email,
-            None => return Err((StatusCode::NOT_FOUND, String::from("User does not exist!"))),
+            None => return Err((StatusCode::FORBIDDEN, String::from("User does not exist!"))),
         };
         // true => Ok(Self(session_repo.create_session(email.clone()).await.unwrap())),
         // false => Err((StatusCode::FORBIDDEN, String::from("Wrong credentials!"))),

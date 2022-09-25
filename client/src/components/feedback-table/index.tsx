@@ -7,50 +7,62 @@ import {
   AccordionPanel,
   Tag,
   Text,
-  InputGroup,
-  Input,
+  Heading,
+  Flex,
+  ListItem,
+  UnorderedList,
+  Code,
   Button,
-  InputRightElement,
 } from "@chakra-ui/react";
-
-interface FeedbackItemMetadata {
-  email?: string;
-  origin?: string;
-  device?: string;
-}
-
-type FeedbackItemType = "issue" | "idea" | "other";
-
-interface FeedbackItem {
-  id: string;
-  content: string;
-  type: FeedbackItemType;
-  createdAt: string;
-  metadata: FeedbackItemMetadata;
-  additionalAttributes?: { [key: string]: string };
-}
+import {
+  Feedback,
+  FeedbackCategory,
+  FeedbackStatus,
+} from "../../interfaces/feedback";
 
 interface FeedbackTableProps {
-  feedbackItems: FeedbackItem[];
+  feedbackItems: Feedback[];
 }
 
-function feedbackItemTag(type: FeedbackItemType) {
+function feedbackStatusTag(type: FeedbackStatus) {
   switch (type) {
-    case "idea": {
+    case "Default": {
+      return (
+        <Tag bgColor="green.400" color="white">
+          Active
+        </Tag>
+      );
+    }
+    case "Archived": {
+      return (
+        <Tag bgColor="gray.400" color="white">
+          Archived
+        </Tag>
+      );
+    }
+    default: {
+      return <Tag>???</Tag>;
+    }
+  }
+}
+
+function feedbackItemTag(type: FeedbackCategory) {
+  switch (type) {
+    case "Idea": {
       return (
         <Tag bgColor="teal.400" color="white">
           Idea
         </Tag>
       );
     }
-    case "issue": {
+    case "Issue": {
       return (
         <Tag bgColor="red.400" color="white">
           Issue
         </Tag>
       );
     }
-    case "other": {
+    case "Other": {
       return (
         <Tag bgColor="orange.300" color="white">
           Other
@@ -66,21 +78,51 @@ function feedbackItemTag(type: FeedbackItemType) {
 function FeedbackTable(props: FeedbackTableProps) {
   return (
     <Box>
-      <Text>
-        {`(${props.feedbackItems.length}/${props.feedbackItems.length}) feedback entries `}
-      </Text>
+      <Heading size="md" marginY={2}>
+        {props.feedbackItems.length} feedback entries found.
+      </Heading>
+      {!props.feedbackItems.length && (
+        <Text>Add feedback using the above command.</Text>
+      )}
       <Accordion defaultIndex={[]} allowToggle>
         {props.feedbackItems.map((fi) => (
           <AccordionItem key={fi.id}>
-            <AccordionButton>
+            <AccordionButton px={0.5}>
               <Box flex="1" textAlign="left">
-                {feedbackItemTag(fi.type)}
-                <Text>{fi.content}</Text>
+                <Flex justifyContent="space-between">
+                  {feedbackItemTag(fi.category)}
+                  <Text>
+                    {new Date(fi.metadata.createdAt).toLocaleString()}
+                  </Text>
+                </Flex>
+                <Text marginY={2}>{fi.description}</Text>
               </Box>
               <AccordionIcon />
             </AccordionButton>
             <AccordionPanel pb={4}>
-              <Box></Box>
+              <Box>
+                <UnorderedList listStyleType="none" marginInlineStart={0}>
+                  {/* <ListItem>
+                    <Heading size="sm" as="span">
+                      Status:{" "}
+                    </Heading>
+                    {feedbackStatusTag(fi.status)}{" "}
+                  </ListItem> */}
+                  <ListItem>
+                    <Heading size="sm" as="span">
+                      Origin:{" "}
+                    </Heading>{" "}
+                    <Code>{fi.location}</Code>
+                  </ListItem>
+                  <ListItem>
+                    <Heading size="sm" as="span">
+                      Device:{" "}
+                    </Heading>{" "}
+                    <Code>{fi.metadata.device}</Code>
+                  </ListItem>
+                </UnorderedList>
+                <Button disabled float="right" my={2}>Archive (WIP)</Button>
+              </Box>
             </AccordionPanel>
           </AccordionItem>
         ))}

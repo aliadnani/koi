@@ -1,40 +1,42 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-import { FormControl, FormLabel, Input, Button, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import shallow from "zustand/shallow";
-import { camelCaseObject } from "../../../common/utils";
-import { useSessionStore } from "../../../store.ts";
-import { logIn } from "../api";
+import { useSession } from "../../../state/session";
+import { registerAccount } from "../api";
 
-function logInForm() {
-  const {
-    handleSubmit,
-    register,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm();
-  const { setSession } = useSessionStore(
-    (state) => ({ setSession: state.setSession }),
-    shallow
-  );
+function registerForm() {
+  // Zustand
+  const { setSessionToken } = useSession();
 
   async function onSubmit(
     values: { name: string; email: string; password: string } | any
   ) {
-    try {
-      const session = await logIn(values.email, values.password);
-      setSession(camelCaseObject(session));
-    } catch (err) {
-      setError("credentials", {
-        type: "custom",
-        message: "Could not log in",
-      });
-    }
+    const session = await registerAccount(
+      values.name,
+      values.email,
+      values.password
+    );
+    setSessionToken(session.token);
   }
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      <FormControl py={1} isInvalid={!!errors.name}>
+        <FormLabel htmlFor="name">Full name</FormLabel>
+        <Input
+          id="name"
+          {...register("name", {
+            required: "This is required",
+          })}
+        />
+      </FormControl>
       <FormControl py={1} isInvalid={!!errors.email}>
         <FormLabel htmlFor="email">Email address</FormLabel>
         <Input
@@ -48,8 +50,8 @@ function logInForm() {
       <FormControl py={1} isInvalid={!!errors.Email}>
         <FormLabel htmlFor="password">Password</FormLabel>
         <Input
-          type="password"
           id="password"
+          type="password"
           {...register("password", {
             required: "This is required",
           })}
@@ -58,11 +60,8 @@ function logInForm() {
       <Button mt={4} colorScheme="red" isLoading={isSubmitting} type="submit">
         Submit
       </Button>
-      <Text py={1} color="red">
-        {errors.credentials?.message?.toString()}
-      </Text>
     </form>
   );
 }
 
-export { logInForm };
+export { registerForm };

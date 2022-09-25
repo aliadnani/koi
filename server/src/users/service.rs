@@ -40,7 +40,7 @@ impl UserService {
     path = "/register",
     request_body = NewUserProfile,
     responses(
-        (status = 200, description = "Account registered succesfully", body = UserProfile),
+        (status = 200, description = "Account registered succesfully", body = Session),
     ),
     tag = "Profile API",
     security(
@@ -83,7 +83,7 @@ async fn log_in(AuthBasic(token): AuthBasic) -> impl IntoResponse {
     get,
     path = "/profile",
     responses(
-        (status = 200, description = "Profile retrived successfully", body = UserProfile)
+        (status = 200, description = "Profile retrived successfully", body = UserProfileWithProjects)
     ),
     security(
         ("Session Token" = [])
