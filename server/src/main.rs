@@ -97,7 +97,7 @@ async fn main() {
                 .allow_methods(Any).allow_headers(Any),
         );
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 6122));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 6122));
     tracing::debug!("Server started on {}!", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
