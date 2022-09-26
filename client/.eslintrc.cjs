@@ -17,5 +17,6 @@ module.exports = {
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
+    "react/no-unescaped-entities": 0
   },
 };
