@@ -57,7 +57,7 @@ function LandingPage() {
                 fontSize={{ base: "xl", sm: "3xl", md: "5xl" }}
                 lineHeight={"110%"}
               >
-                Get feedback from customers, fast and easily.
+                An open-source & self-hostable feedback platform
               </Heading>
             </Box>
             <Text color={"gray.500"}>
