@@ -1,3 +1,7 @@
+use std::sync::Arc;
+
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite_migration::{Migrations, M};
 
 pub fn migrations() -> Migrations<'static> {
@@ -67,4 +71,29 @@ pub fn migrations() -> Migrations<'static> {
         "#,
         ),
     ])
+}
+
+pub fn start_up(pool: Arc<Pool<SqliteConnectionManager>>) {
+    pool.get()
+        .expect("Could not get a connection from SQLite pool.")
+        .pragma_update(None, "journal_mode", &"WAL")
+        .expect("Failed to set journal mode to WAL");
+
+    pool.get()
+        .expect("Could not get a connection from SQLite pool.")
+        .pragma_update(None, "foreign_keys", &"ON")
+        .expect("Failed to enable strict mode");
+
+    pool.get()
+        .expect("Could not get a connection from SQLite pool.")
+        .pragma_update(None, "strict", &"ON")
+        .expect("Failed to enable foreign keys");
+
+    migrations()
+        .to_latest(
+            &mut pool
+                .get()
+                .expect("Could not get a connection from SQLite pool."),
+        )
+        .expect("Failed to run migrations");
 }

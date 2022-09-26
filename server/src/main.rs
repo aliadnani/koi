@@ -1,6 +1,7 @@
-use axum::{http::Method, Router};
+use axum::Router;
 use r2d2_sqlite::SqliteConnectionManager;
 use std::{net::SocketAddr, sync::Arc};
+use stretto::AsyncCache;
 use tower_http::{
     catch_panic::CatchPanicLayer,
     cors::{Any, CorsLayer},
@@ -12,7 +13,7 @@ use crate::{
     feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
     openapi::ApiDoc,
     project::{repo::ProjectRepositorySqlite, service::ProjectService},
-    sessions::SessionRepositorySqlite,
+    sessions::stretto::SessionRepositoryStretto,
     users::{repo::UserRepositorySqlite, service::UserService},
 };
 use utoipa::OpenApi;
@@ -39,38 +40,29 @@ async fn main() {
 
     // Initialize DB
     let manager = SqliteConnectionManager::file("koi.db");
-    // let manager = SqliteConnectionManager::memory();
-
     let pool = Arc::new(r2d2::Pool::new(manager).expect("Could not acquire SQLite pool."));
 
-    pool.get()
-        .expect("Could not get a connection from SQLite pool.")
-        .pragma_update(None, "journal_mode", &"WAL")
-        .expect("Failed to set journal mode to WAL");
+    // Runs db migrations and sets sqlite config
+    db::sqlite::start_up(pool.clone());
 
-    pool.get()
-        .expect("Could not get a connection from SQLite pool.")
-        .pragma_update(None, "foreign_keys", &"ON")
-        .expect("Failed to enable strict mode");
-
-    pool.get()
-        .expect("Could not get a connection from SQLite pool.")
-        .pragma_update(None, "strict", &"ON")
-        .expect("Failed to enable foreign keys");
-
-    db::sqlite::migrations()
-        .to_latest(
-            &mut pool
-                .get()
-                .expect("Could not get a connection from SQLite pool."),
+    // Initialize session cache
+    let cache = Arc::new(
+        AsyncCache::<String, String>::new(
+            // Max 100_000_000 sessions in cache
+            100_000_000,
+            // I have no idea what cost is
+            // need to look into https://github.com/dgraph-io/ristrettomore
+            1_073_741_824,
+            tokio::spawn,
         )
-        .expect("Failed to run migrations");
+        .expect("Could not construct stretto cache"),
+    );
 
     // Initialize repos
     let project_repo = Arc::new(ProjectRepositorySqlite::new(pool.clone()));
     let user_repo = Arc::new(UserRepositorySqlite::new(pool.clone()));
     let feedback_repo = Arc::new(FeedbackRepositorySqlite::new(pool.clone()));
-    let session_repo = Arc::new(SessionRepositorySqlite::new(pool.clone()));
+    let session_repo = Arc::new(SessionRepositoryStretto::new(cache.clone()));
 
     // Initialize services
     let project_service = ProjectService::new(
@@ -83,12 +75,16 @@ async fn main() {
     let feedback_service = FeedbackService::new(feedback_repo.clone());
 
     let app = Router::new()
+        // App services
         .merge(project_service.routes())
         .merge(profile_service.routes())
         .merge(feedback_service.routes())
-        .layer(TraceLayer::new_for_http())
-        .layer(CatchPanicLayer::new())
         .merge(SwaggerUi::new("/swagger-ui/*tail").url("/api-doc/openapi.json", ApiDoc::openapi()))
+        // Logging
+        .layer(TraceLayer::new_for_http())
+        // Return 500s on panics
+        .layer(CatchPanicLayer::new())
+        // CORS
         .layer(
             CorsLayer::new()
                 .allow_origin(Any)
