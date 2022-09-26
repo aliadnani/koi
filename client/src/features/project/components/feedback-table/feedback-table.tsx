@@ -18,12 +18,13 @@ import {
   Feedback,
   FeedbackCategory,
   FeedbackStatus,
-} from "../../interfaces/feedback";
+} from "../../../../interfaces/feedback";
 
 interface FeedbackTableProps {
   feedbackItems: Feedback[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function feedbackStatusTag(type: FeedbackStatus) {
   switch (type) {
     case "Default": {

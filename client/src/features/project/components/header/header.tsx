@@ -4,35 +4,23 @@ import {
   Button,
   ButtonGroup,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   Heading,
-  Input,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Project } from "../../interfaces/project";
-import { createProject } from "../../features/project/api";
-import { useSession } from "../../state/session";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getUserProfile } from "../../features/profile/api";
+import { Project } from "../../../../interfaces/project";
+import { useSession } from "../../../../state/session";
+import { useQuery } from "@tanstack/react-query";
+import { getUserProfile } from "../../../profile/api";
+import { CreateProjectModal } from "./create-project-modal";
 
 function Header(): JSX.Element {
-  // Zustand
+  // Zustand state
   const {
     sessionToken,
     clearSessionToken,
@@ -40,39 +28,25 @@ function Header(): JSX.Element {
     setSelectedProjectId,
   } = useSession();
 
-  // React Query
-
-  const queryClient = useQueryClient();
-
-  const projectMutation = useMutation(
-    async (values: { projectName: string; token: string }) =>
-      await createProject(values.projectName, values.token),
-    {
-      onSuccess: async (data, variables) => {
-        await queryClient.invalidateQueries(["profile"]);
-      },
-    }
-  );
-
-  // Profile from react query
+  // React Query state
   const { data: userProfile } = useQuery(
     ["profile"],
     async () => await getUserProfile(sessionToken),
     { enabled: !!sessionToken }
   );
 
-  // Hook form for creating a new project
-  const { handleSubmit, register } = useForm<{ projectName: string }>();
-
   // For controlling the project selector mode
   const [isSwitchingProject, setIsSwitchingProject] = useState(false);
+
+  // Create project modal
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   function mainMenuItems() {
     return (
       <>
         <MenuItem
-          isDisabled
-          // isDisabled={!userProfile?.projects.length}
+          // TODO: Implement project settings
+          isDisabled={!userProfile?.projects.length || true}
         >
           Settings (WIP)
         </MenuItem>
@@ -107,15 +81,6 @@ function Header(): JSX.Element {
       </>
     );
   }
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  async function onSubmit(values: { projectName: string }) {
-    projectMutation.mutate({
-      projectName: values.projectName,
-      token: sessionToken ?? "",
-    });
-    onClose();
-  }
 
   return (
     <Flex justifyContent="space-between" alignItems="center">
@@ -132,6 +97,7 @@ function Header(): JSX.Element {
             {userProfile?.projects.find((p) => p.id === selectedProjectId)
               ?.name ?? "Create a new project"}
           </MenuButton>
+          <CreateProjectModal isOpen={isOpen} onClose={onClose} />
           <MenuList>
             {isSwitchingProject
               ? switchingProjectMenuItems(userProfile?.projects ?? [])
@@ -142,43 +108,6 @@ function Header(): JSX.Element {
       <ButtonGroup>
         <Button onClick={clearSessionToken}>Log Out</Button>
       </ButtonGroup>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create a new project</ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
-              <FormControl isRequired>
-                <FormLabel>Project name</FormLabel>
-                <Input
-                  type="text"
-                  id="projectName"
-                  {...register("projectName", {
-                    required: "This is required",
-                  })}
-                />
-
-                <FormHelperText>
-                  Enter the name of your new project
-                </FormHelperText>
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                type="submit"
-                onClick={() => {
-                  onClose();
-                }}
-                variant="outline"
-              >
-                Submit
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
     </Flex>
   );
 }

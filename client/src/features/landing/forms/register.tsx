@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Input,
+} from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useSession } from "../../../state/session";
 import { registerAccount } from "../api";
@@ -56,6 +62,9 @@ function registerForm() {
             required: "This is required",
           })}
         />
+        <FormHelperText>
+          Don't lose this password as I haven't implemented password resets yet!
+        </FormHelperText>
       </FormControl>
       <Button mt={4} colorScheme="red" isLoading={isSubmitting} type="submit">
         Submit

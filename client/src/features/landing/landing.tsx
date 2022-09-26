@@ -57,20 +57,18 @@ function LandingPage() {
                 fontSize={{ base: "xl", sm: "3xl", md: "5xl" }}
                 lineHeight={"110%"}
               >
-                Collecting user feedback made simple
+                Get feedback from customers, fast and easily.
               </Heading>
             </Box>
             <Text color={"gray.500"}>
-              Still very much in alpha. Do not use for for productive use.
+              Still very much in alpha. Do not use for for productive purposes.
               Passwords are <Code>argon2</Code> hashed, but for your own safety,
               do not re-use any personal passwords.
               <br />
               <br />
               Made with <Code>React</Code>, <Code>Rust</Code> &{" "}
-              <Code>SQLite</Code>
-              {/* <br />
-              <br />
-              Backed by <Code>litestream</Code> and hosted an a Hetzner VPS */}
+              <Code>SQLite</Code> - considering <Code>PostgreSQL</Code> in the
+              future!
             </Text>
             <Link isExternal href="https://github.com/aliadnani/koi">
               https://github.com/aliadnani/koi

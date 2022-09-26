@@ -8,6 +8,7 @@ interface SessionStore {
   clearSessionToken: () => void;
 
   // Project related settings
+  // TODO: Should be handled in URL
   selectedProjectId?: string;
   setSelectedProjectId: (projectId: string) => void;
 }
