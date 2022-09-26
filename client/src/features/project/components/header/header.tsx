@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 import {
+  Box,
   Button,
   ButtonGroup,
   Flex,
@@ -18,6 +19,7 @@ import { useSession } from "../../../../state/session";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "../../../profile/api";
 import { CreateProjectModal } from "./create-project-modal";
+import { ReactComponent as KoiLogo } from "../../../../assets/koi.svg";
 
 function Header(): JSX.Element {
   // Zustand state
@@ -85,6 +87,7 @@ function Header(): JSX.Element {
   return (
     <Flex justifyContent="space-between" alignItems="center">
       <ButtonGroup alignItems="center">
+        <KoiLogo height="2rem" width="2rem"/>
         <Heading
           fontWeight={600}
           fontSize={{ base: "xl", sm: "2xl", md: "4xl" }}

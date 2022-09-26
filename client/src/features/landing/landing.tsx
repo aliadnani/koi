@@ -11,6 +11,7 @@ import {
   TabPanels,
   Tabs,
   Code,
+  Flex,
 } from "@chakra-ui/react";
 import { logInForm } from "./forms/login";
 import { registerForm } from "./forms/register";
@@ -18,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "../../state/session";
+import { ReactComponent as KoiLogo } from "../../assets/koi.svg";
 
 function LandingPage() {
   const { sessionToken } = useSession();
@@ -49,8 +51,10 @@ function LandingPage() {
                 fontWeight={600}
                 fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
                 lineHeight={"110%"}
+                display="inline-flex"
               >
-                Koi
+                <KoiLogo/>
+                &nbsp;Koi
               </Heading>
               <Heading
                 fontWeight={300}
