@@ -9,7 +9,7 @@ function FeedbackInfoBlock(props: { apiBaseUrl: string; projectId: string }) {
       You can:
       <UnorderedList>
         <ListItem>
-          Create and switch between projects on the top-left dropdown
+          Create and switch between projects using the the top-left dropdown
         </ListItem>
         <ListItem>View and manage collected feedback below</ListItem>
       </UnorderedList>
