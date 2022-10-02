@@ -130,7 +130,6 @@ impl UserRepository for UserRepositoryPostgres {
     async fn get_profile_by_email(&self, email: String) -> Result<Option<UserProfile>> {
         let mut conn = self.conn.acquire().await.unwrap();
 
-        let mut conn = self.conn.acquire().await.unwrap();
         let profile = query_as!(
             UserProfile,
             "SELECT id, name, email, created_at FROM users WHERE email = $1",

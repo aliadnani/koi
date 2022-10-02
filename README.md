@@ -14,13 +14,20 @@ An open-source & self-hostable feedback platform
 
 - `Node.js` & `pnpm`
 - Rust toolchain (`rustup`)
+- Docker
 
 ### Starting Server
 
 ```bash
 cd server
 
-# Within /koi/server directory
+# Start Postgres
+docker compose up -d
+
+# Run schema migrations
+ sh ./dbmate.sh up
+
+# Run application - within /koi/server directory
 cargo run
 
 ...
@@ -35,7 +42,12 @@ cd client
 
 # Within /koi/client directory
 pnpm install
+
+...
+
 pnpm run dev
+
+...
 
   VITE v3.1.0  ready in 402 ms
 

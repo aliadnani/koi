@@ -1,0 +1,499 @@
+{
+  "db": "PostgreSQL",
+  "0f797f257a16320fc6b5b7bb0ad6a859b85395d3cd1872c0ca071c81ade6e3fe": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id FROM projects WHERE id = $1"
+  },
+  "14e21d368f1cd14eb831d3ea9a6aab5c9da7c4753f15461523a006379b12e473": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO user_sessions (token, user_email, expires_at)\n            VALUES ($1, $2, $3);"
+  },
+  "4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id FROM users WHERE email = $1"
+  },
+  "45bd8d8b68e2b4f709b6a4e11742d45ba2b56e7e165bf7c4a1aa3bc53c974d39": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id, name, created_at FROM projects WHERE id = $1"
+  },
+  "520c4834e668e5553641ea6b43d7a491b21bb1c50f80baf45666c911582698d6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "INSERT INTO projects (id, name, created_at) VALUES ($1, $2, $3);"
+  },
+  "5fff0fdb5c4b2f2c8d88ae2949ad87e5aee594b2e8e23809f48633e789e669dc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n                SELECT p.id, p.name, p.created_at\n                FROM projects p\n                JOIN users_projects up ON p.id = up.project_id\n                WHERE up.user_id = $1\n                "
+  },
+  "635aa8099fbb5cd7478953d8b8fb71fe71ede3e16b56c7c3384efd879a4a1d99": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "location",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "status",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "category",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "metadata",
+          "ordinal": 5,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "additional_attributes",
+          "ordinal": 6,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "project_id",
+          "ordinal": 7,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            SELECT id, description, location, status, category, metadata, additional_attributes, project_id\n            FROM feedback\n            WHERE id = $1;\n            "
+  },
+  "7341247c633de62807787e443e027aa56aa9ce853cfc4c019b3d958cf19967da": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n                SELECT u.id\n                FROM users u\n                JOIN users_projects up ON u.id = up.user_id\n                WHERE up.project_id = $1 AND u.email = $2;\n                "
+  },
+  "80230f054811a02e6fcfc44b9d7e2e9ec22862ac5c7e0b87e9a104c4fd142647": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "DELETE FROM users_projects WHERE user_id = $1 AND project_id = $2;"
+  },
+  "8a4575e1f3a2d2c31bb7e4873884e252cb213a4e2c25b4cc3e48cdddf292769c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n                SELECT u.id, u.name, u.email, u.created_at\n                FROM users u\n                JOIN users_projects up ON u.id = up.user_id\n                WHERE up.project_id = $1\n                "
+  },
+  "960cd6989173b2afc0ebf7abcfbda441082abc1b0d7dfb986ee625434ca2e9e1": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO users (id, name, email, password_hash, created_at)\n            VALUES ($1, $2, $3, $4, $5);"
+  },
+  "9b1324eb144ed98a293e6e2996b1df8301c1854488a3e0a240d3e646eb270db7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id, name, email, created_at FROM users WHERE email = $1"
+  },
+  "a7b03284e3e7ed53142dbac28c9cc6b221e88452ecbaba95b0933ac6d3159140": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "INSERT INTO users_projects (user_id, project_id) VALUES ($1, $2);"
+  },
+  "aeb4bfd350052ed30de998f1987f5653552e91d7069b27f27b01d79dddc39318": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Jsonb",
+          "Jsonb",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO feedback (id, description, location, status, category, metadata, additional_attributes, project_id)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8);"
+  },
+  "eb098dd68af9b17e44b004c03e8f26496e3538be6af91a141ca9fd7f40cebd5b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "location",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "status",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "category",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "metadata",
+          "ordinal": 5,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "additional_attributes",
+          "ordinal": 6,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "project_id",
+          "ordinal": 7,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            SELECT id, description, location, status, category, metadata, additional_attributes, project_id\n            FROM feedback\n            WHERE project_id = $1;\n            "
+  },
+  "eb2a7da09f563615545502b3add62274f73770f1e887c4238d267cee8e233587": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "DELETE FROM user_sessions WHERE token = $1;"
+  },
+  "efc71d148245239947fd31bc74e17a5f181929669ad82b9ec6d43e9a7e26f780": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_email",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "expires_at",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT user_email, expires_at FROM user_sessions WHERE token = $1"
+  },
+  "fbf321d3b8befc4d393501779c6519bc4e09db9181ae7f4d83f6409d1ecbf55c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 4,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id, name, email, created_at, password_hash FROM users WHERE email = $1"
+  }
+}

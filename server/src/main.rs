@@ -1,8 +1,6 @@
 use axum::Router;
-use r2d2_sqlite::SqliteConnectionManager;
-use sqlx::postgres::PgPoolOptions;
+use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, sync::Arc};
-use stretto::AsyncCache;
 use tower_http::{
     catch_panic::CatchPanicLayer,
     cors::{Any, CorsLayer},
@@ -11,11 +9,11 @@ use tower_http::{
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::{
-    feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
+    feedback::{repo::postgres::FeedbackRepositoryPostgres, service::FeedbackService},
     openapi::ApiDoc,
-    project::{repo::sqlite::ProjectRepositorySqlite, service::ProjectService},
-    sessions::stretto::SessionRepositoryStretto,
-    users::{repo::sqlite::UserRepositorySqlite, service::UserService},
+    project::{repo::postgres::ProjectRepositoryPostgres, service::ProjectService},
+    sessions::postgres::SessionRepositoryPostgres,
+    users::{repo::postgres::UserRepositoryPostgres, service::UserService},
 };
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -40,37 +38,20 @@ async fn main() {
         .init();
 
     // Initialize DB
-    let manager = SqliteConnectionManager::file("koi.db");
-    let pool = Arc::new(r2d2::Pool::new(manager).expect("Could not acquire SQLite pool."));
+    let pool: PgPool = PgPoolOptions::new()
+        .max_connections(50)
+        // TODO: Load via config
+        .connect("postgresql://koi:ca5WYy8P4x9CfyXxjrik@localhost:5432/koi?sslmode=disable")
+        .await
+        .expect("Could not get Postgres pool");
 
-    // let pool = PgPoolOptions::new()
-    //     .max_connections(15)
-    //     // TODO: Load via config
-    //     .connect("postgresql://koi:ca5WYy8P4x9CfyXxjrik@localhost:5432/koi?sslmode=disable")
-    //     .await
-    //     .expect("Could not get Postgres pool");
-
-    // Runs db migrations and sets sqlite config
-    db::sqlite::start_up(pool.clone());
-
-    // Initialize session cache
-    let cache = Arc::new(
-        AsyncCache::<String, String>::new(
-            // Max 100_000_000 sessions in cache
-            100_000_000,
-            // I have no idea what cost is
-            // need to look into https://github.com/dgraph-io/ristrettomore
-            1_073_741_824,
-            tokio::spawn,
-        )
-        .expect("Could not construct stretto cache"),
-    );
+    let pool = Arc::new(pool);
 
     // Initialize repos
-    let project_repo = Arc::new(ProjectRepositorySqlite::new(pool.clone()));
-    let user_repo = Arc::new(UserRepositorySqlite::new(pool.clone()));
-    let feedback_repo = Arc::new(FeedbackRepositorySqlite::new(pool.clone()));
-    let session_repo = Arc::new(SessionRepositoryStretto::new(cache.clone()));
+    let project_repo = Arc::new(ProjectRepositoryPostgres::new(pool.clone()));
+    let user_repo = Arc::new(UserRepositoryPostgres::new(pool.clone()));
+    let feedback_repo = Arc::new(FeedbackRepositoryPostgres::new(pool.clone()));
+    let session_repo = Arc::new(SessionRepositoryPostgres::new(pool.clone()));
 
     // Initialize services
     let project_service = ProjectService::new(

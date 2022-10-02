@@ -6,7 +6,6 @@ use eyre::Result;
 use super::model::{Feedback, NewFeedback};
 
 pub mod postgres;
-pub mod sqlite;
 
 pub type FeedbackRepositoryDyn = Arc<dyn FeedbackRepository + Send + Sync>;
 

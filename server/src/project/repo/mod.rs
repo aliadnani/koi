@@ -13,7 +13,6 @@ use super::{
 pub type ProjectRepositoryDyn = Arc<dyn ProjectRepository + Send + Sync>;
 
 pub mod postgres;
-pub mod sqlite;
 
 /// `ProjectRepository` is abstracted to a trait to allow for using a seperate `ProjectRepository` in tests
 #[async_trait]

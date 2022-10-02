@@ -100,14 +100,14 @@ impl FeedbackRepository for FeedbackRepositoryPostgres {
         .await?
         .iter()
         .map(|r| Feedback {
-            id: r.id,
-            description: r.description,
-            location: r.location,
+            id: r.id.clone(),
+            description: r.description.clone(),
+            location: r.location.clone(),
             status: FeedbackStatus::from_str(&r.status).unwrap(),
             category: FeedbackCategory::from_str(&r.category).unwrap(),
-            metadata: serde_json::from_value(r.metadata).unwrap(),
-            additional_attributes: serde_json::from_value(r.additional_attributes).unwrap(),
-            project_id: r.project_id,
+            metadata: serde_json::from_value(r.metadata.clone()).unwrap(),
+            additional_attributes: serde_json::from_value(r.additional_attributes.clone()).unwrap(),
+            project_id: r.project_id.clone(),
         })
         .collect();
 

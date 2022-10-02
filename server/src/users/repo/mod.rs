@@ -7,7 +7,6 @@ use eyre::Result;
 use super::model::{NewUserProfile, UserProfile};
 
 pub mod postgres;
-pub mod sqlite;
 
 pub type UserRepositoryDyn = Arc<dyn UserRepository + Send + Sync>;
 
