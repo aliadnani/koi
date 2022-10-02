@@ -87,7 +87,7 @@ function ProjectHelpPage() {
                   display="block"
                   whiteSpace="pre"
                 >
-                  {exampleForm(projectId, Globals.apiBaseUrl)}
+                  {exampleForm(projectId as string, Globals.apiBaseUrl)}
                 </Code>
               </ModalBody>
             </ModalContent>
@@ -105,7 +105,7 @@ function ProjectHelpPage() {
           display="block"
           whiteSpace="pre"
         >
-          {exampleCurl(projectId, Globals.apiBaseUrl)}
+          {exampleCurl(projectId as string, Globals.apiBaseUrl)}
         </Code>
         <br />
         <Code>category</Code> can be one of{" "}
