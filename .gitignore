@@ -1,2 +1,3 @@
 server/koi.db*
 server/target
+server/.env

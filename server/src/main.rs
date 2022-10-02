@@ -1,6 +1,6 @@
 use axum::Router;
 use sqlx::{postgres::PgPoolOptions, PgPool};
-use std::{net::SocketAddr, sync::Arc};
+use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::{
     catch_panic::CatchPanicLayer,
     cors::{Any, CorsLayer},
@@ -37,11 +37,17 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    tracing::info!(
+        "Pg connection at: {}",
+        env::var("DATABASE_URL").unwrap().as_str()
+    );
+
     // Initialize DB
     let pool: PgPool = PgPoolOptions::new()
         .max_connections(50)
         // TODO: Load via config
-        .connect("postgresql://koi:ca5WYy8P4x9CfyXxjrik@localhost:5432/koi?sslmode=disable")
+        // .connect("postgresql://koi:ca5WYy8P4x9CfyXxjrik@localhost:5432/koi?sslmode=disable")
+        .connect(env::var("DATABASE_URL").unwrap().as_str())
         .await
         .expect("Could not get Postgres pool");
 

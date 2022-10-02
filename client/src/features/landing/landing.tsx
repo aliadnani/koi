@@ -71,8 +71,7 @@ function LandingPage() {
               <br />
               <br />
               Made with <Code>React</Code>, <Code>Rust</Code> &{" "}
-              <Code>SQLite</Code> - considering <Code>PostgreSQL</Code> in the
-              future!
+              <Code>PostgreSQL</Code>
             </Text>
             <Link isExternal href="https://github.com/aliadnani/koi">
               https://github.com/aliadnani/koi
