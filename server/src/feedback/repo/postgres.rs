@@ -53,7 +53,7 @@ impl FeedbackRepository for FeedbackRepositoryPostgres {
                 serde_json::to_value(&feedback.metadata).unwrap(),
                 serde_json::to_value(&feedback.additional_attributes).unwrap(),
                 &feedback.project_id,
-        ).execute(&mut conn);
+        ).execute(&mut conn).await?;
 
         Ok(feedback)
     }

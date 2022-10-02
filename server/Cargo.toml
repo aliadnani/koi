@@ -20,6 +20,7 @@ stretto = { version = "0.7.0", features = ["async"] }
 strum = { version = "0.24", features = ["derive"] }
 thiserror = "1.0.35"
 tokio = { version = "1.21.0", features = ["full"] }
+tokio-cron-scheduler = "0.8.1"
 tower-http = { version = "0.3.4", features = ["cors", "tracing", "trace", "catch-panic"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.15", features = ["env-filter"] }
