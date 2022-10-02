@@ -7,6 +7,11 @@ export interface UserProfileApi {
   name: string;
   email: string;
   created_at: string;
+}
+export type UserProfileWithProjects =
+  CamelCasedPropertiesDeep<UserProfileWithProjectsApi>;
+export interface UserProfileWithProjectsApi {
+  user_profile: UserProfileApi;
   projects: ProjectApi[];
 }
 

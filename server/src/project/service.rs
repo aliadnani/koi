@@ -171,14 +171,14 @@ async fn add_user_to_project(
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
-    match project_repo
-        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
-        .await
-        .unwrap()
-    {
-        true => return (StatusCode::FORBIDDEN).into_response(),
-        false => (),
-    }
+    // match project_repo
+    //     .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
+    //     .await
+    //     .unwrap()
+    // {
+    //     true => return (StatusCode::FORBIDDEN).into_response(),
+    //     false => (),
+    // }
 
     let feedback = match project_repo
         .add_user_to_project(project_id.clone(), user_project_addition.email)
@@ -224,14 +224,14 @@ async fn remove_user_from_project(
     Extension(project_repo): Extension<ProjectRepositoryDyn>,
     AuthBearer(user_profile): AuthBearer,
 ) -> impl IntoResponse {
-    match project_repo
-        .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
-        .await
-        .unwrap()
-    {
-        true => return (StatusCode::FORBIDDEN).into_response(),
-        false => (),
-    }
+    // match project_repo
+    //     .check_if_user_is_part_of_project(project_id.clone(), user_profile.email)
+    //     .await
+    //     .unwrap()
+    // {
+    //     true => return (StatusCode::FORBIDDEN).into_response(),
+    //     false => (),
+    // }
 
     let feedback = match project_repo
         .remove_user_from_project(project_id.clone(), user_project_removal.email)

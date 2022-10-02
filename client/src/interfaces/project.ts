@@ -15,5 +15,5 @@ export interface NewProjectApi {
 export type UserProjectAdditionRemoval =
   CamelCasedPropertiesDeep<UserProjectAdditionRemovalApi>;
 export interface UserProjectAdditionRemovalApi {
-  name: string;
+  email: string;
 }

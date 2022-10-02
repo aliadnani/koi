@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 import {
-  Box,
   Button,
   ButtonGroup,
   Flex,
@@ -20,15 +19,16 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "../../../profile/api";
 import { CreateProjectModal } from "./create-project-modal";
 import { ReactComponent as KoiLogo } from "../../../../assets/koi.svg";
+import { useAppParams } from "../../../../router";
+import { useNavigate } from "react-router-dom";
 
 function Header(): JSX.Element {
+  // React Router
+  const navigate = useNavigate();
+  const { projectId } = useAppParams();
+
   // Zustand state
-  const {
-    sessionToken,
-    clearSessionToken,
-    selectedProjectId,
-    setSelectedProjectId,
-  } = useSession();
+  const { sessionToken, clearSessionToken } = useSession();
 
   // React Query state
   const { data: userProfile } = useQuery(
@@ -47,8 +47,8 @@ function Header(): JSX.Element {
     return (
       <>
         <MenuItem
-          // TODO: Implement project settings
-          isDisabled={!userProfile?.projects.length || true}
+          isDisabled={!userProfile?.projects.length}
+          onClick={() => navigate(`${projectId as string}/settings`)}
         >
           Settings (WIP)
         </MenuItem>
@@ -76,7 +76,7 @@ function Header(): JSX.Element {
         </MenuItem>
         <MenuDivider />
         {projects.map((p) => (
-          <MenuItem onClick={() => setSelectedProjectId(p.id)} key={p.id}>
+          <MenuItem onClick={() => navigate(p.id)} key={p.id}>
             {p.name}
           </MenuItem>
         ))}
@@ -87,7 +87,7 @@ function Header(): JSX.Element {
   return (
     <Flex justifyContent="space-between" alignItems="center">
       <ButtonGroup alignItems="center">
-        <KoiLogo height="2rem" width="2rem"/>
+        <KoiLogo height="2rem" width="2rem" />
         <Heading
           fontWeight={600}
           fontSize={{ base: "xl", sm: "2xl", md: "4xl" }}
@@ -97,8 +97,8 @@ function Header(): JSX.Element {
         </Heading>
         <Menu onClose={() => setIsSwitchingProject(false)}>
           <MenuButton variant="outline" as={Button}>
-            {userProfile?.projects.find((p) => p.id === selectedProjectId)
-              ?.name ?? "Create a new project"}
+            {userProfile?.projects.find((p) => p.id === projectId)?.name ??
+              "Create a new project"}
           </MenuButton>
           <CreateProjectModal isOpen={isOpen} onClose={onClose} />
           <MenuList>
@@ -109,6 +109,15 @@ function Header(): JSX.Element {
         </Menu>
       </ButtonGroup>
       <ButtonGroup>
+        {projectId && (
+          <Button
+            onClick={() => {
+              navigate(`${projectId}/help`);
+            }}
+          >
+            Help
+          </Button>
+        )}
         <Button onClick={clearSessionToken}>Log Out</Button>
       </ButtonGroup>
     </Flex>

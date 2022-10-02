@@ -10,7 +10,6 @@ interface SessionStore {
   // Project related settings
   // TODO: Should be handled in URL
   selectedProjectId?: string;
-  setSelectedProjectId: (projectId: string) => void;
 }
 
 const useSessionStore = create<SessionStore>()((set) => ({
@@ -21,9 +20,6 @@ const useSessionStore = create<SessionStore>()((set) => ({
   clearSessionToken() {
     set({ sessionToken: undefined });
   },
-  setSelectedProjectId(projectId) {
-    set({ selectedProjectId: projectId });
-  },
 }));
 
 const useSession = () =>
@@ -33,10 +29,6 @@ const useSession = () =>
       sessionToken: state.sessionToken,
       setSessionToken: state.setSessionToken,
       clearSessionToken: state.clearSessionToken,
-
-      // Project related settings
-      selectedProjectId: state.selectedProjectId,
-      setSelectedProjectId: state.setSelectedProjectId,
     }),
     shallow
   );

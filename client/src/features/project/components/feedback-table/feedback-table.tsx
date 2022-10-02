@@ -14,15 +14,15 @@ import {
   Code,
   Button,
 } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import { Outlet } from "react-router-dom";
 import {
-  Feedback,
   FeedbackCategory,
   FeedbackStatus,
 } from "../../../../interfaces/feedback";
-
-interface FeedbackTableProps {
-  feedbackItems: Feedback[];
-}
+import { useAppParams } from "../../../../router";
+import { useSession } from "../../../../state/session";
+import { getProjectFeedback } from "../../api";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function feedbackStatusTag(type: FeedbackStatus) {
@@ -76,17 +76,46 @@ function feedbackItemTag(type: FeedbackCategory) {
   }
 }
 
-function FeedbackTable(props: FeedbackTableProps) {
+function FeedbackTable() {
+  const { sessionToken } = useSession();
+
+  const { projectId } = useAppParams();
+
+  const { data: feedbackItems } = useQuery(
+    ["projectFeedback", projectId],
+    async () =>
+      await getProjectFeedback(projectId as string, sessionToken as string),
+    { enabled: !!sessionToken && !!projectId, refetchInterval: 1500 }
+  );
   return (
     <Box>
+      <Outlet />
       <Heading size="md" marginY={2}>
-        {props.feedbackItems.length} feedback entries found.
+        {feedbackItems?.length} feedback entries found.
       </Heading>
-      {!props.feedbackItems.length && (
-        <Text>Add feedback using the above command.</Text>
+      {!feedbackItems?.length && (
+        <>
+          <Text>
+            Welcome to Koi!
+            <br />
+            <br />
+            You can:
+            <br />
+          </Text>
+          <UnorderedList>
+            <ListItem>
+              Create and switch between projects using the the top-left dropdown
+            </ListItem>
+            <ListItem>View and manage collected feedback below</ListItem>
+          </UnorderedList>
+            <br />
+          <Text>
+            Click the 'Help' button to see how you can collect feedback.
+          </Text>
+        </>
       )}
       <Accordion defaultIndex={[]} allowToggle>
-        {props.feedbackItems.map((fi) => (
+        {feedbackItems?.map((fi) => (
           <AccordionItem key={fi.id}>
             <AccordionButton px={0.5}>
               <Box flex="1" textAlign="left">
@@ -103,12 +132,6 @@ function FeedbackTable(props: FeedbackTableProps) {
             <AccordionPanel pb={4}>
               <Box>
                 <UnorderedList listStyleType="none" marginInlineStart={0}>
-                  {/* <ListItem>
-                    <Heading size="sm" as="span">
-                      Status:{" "}
-                    </Heading>
-                    {feedbackStatusTag(fi.status)}{" "}
-                  </ListItem> */}
                   <ListItem>
                     <Heading size="sm" as="span">
                       Origin:{" "}

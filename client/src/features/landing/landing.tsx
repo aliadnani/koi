@@ -53,7 +53,7 @@ function LandingPage() {
                 lineHeight={"110%"}
                 display="inline-flex"
               >
-                <KoiLogo/>
+                <KoiLogo />
                 &nbsp;Koi
               </Heading>
               <Heading
