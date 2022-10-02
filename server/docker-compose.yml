@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  koi-db:
+    container_name: koi-db
+    image: postgres:14.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=koi
+      - POSTGRES_PASSWORD=ca5WYy8P4x9CfyXxjrik
+    ports:
+      - '5432:5432'
+    volumes: 
+      - koi-db:/var/lib/postgresql/data
+volumes:
+  koi-db:
+    driver: local

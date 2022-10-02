@@ -1,5 +1,6 @@
 use axum::Router;
 use r2d2_sqlite::SqliteConnectionManager;
+use sqlx::postgres::PgPoolOptions;
 use std::{net::SocketAddr, sync::Arc};
 use stretto::AsyncCache;
 use tower_http::{
@@ -12,9 +13,9 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::{
     feedback::{repo::FeedbackRepositorySqlite, service::FeedbackService},
     openapi::ApiDoc,
-    project::{repo::ProjectRepositorySqlite, service::ProjectService},
+    project::{repo::sqlite::ProjectRepositorySqlite, service::ProjectService},
     sessions::stretto::SessionRepositoryStretto,
-    users::{repo::UserRepositorySqlite, service::UserService},
+    users::{repo::sqlite::UserRepositorySqlite, service::UserService},
 };
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -41,6 +42,13 @@ async fn main() {
     // Initialize DB
     let manager = SqliteConnectionManager::file("koi.db");
     let pool = Arc::new(r2d2::Pool::new(manager).expect("Could not acquire SQLite pool."));
+
+    // let pool = PgPoolOptions::new()
+    //     .max_connections(15)
+    //     // TODO: Load via config
+    //     .connect("postgresql://koi:ca5WYy8P4x9CfyXxjrik@localhost:5432/koi?sslmode=disable")
+    //     .await
+    //     .expect("Could not get Postgres pool");
 
     // Runs db migrations and sets sqlite config
     db::sqlite::start_up(pool.clone());

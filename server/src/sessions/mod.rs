@@ -6,6 +6,7 @@ use utoipa::ToSchema;
 
 use crate::users::model::UserProfile;
 
+pub mod postgres;
 pub mod sqlite;
 pub mod stretto;
 

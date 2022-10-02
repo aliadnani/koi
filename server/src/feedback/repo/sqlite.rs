@@ -7,21 +7,12 @@ use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::OptionalExtension;
 
-use crate::common::new_nanoid;
+use crate::{
+    common::new_nanoid,
+    feedback::model::{Feedback, FeedbackCategory, FeedbackMetadata, FeedbackStatus, NewFeedback},
+};
 
-use super::model::{Feedback, FeedbackCategory, FeedbackMetadata, FeedbackStatus, NewFeedback};
-
-pub type FeedbackRepositoryDyn = Arc<dyn FeedbackRepository + Send + Sync>;
-
-/// `FeedbackRepository` is abstracted to a trait to allow for using a seperate `FeedbackRepository` in tests
-#[async_trait]
-pub trait FeedbackRepository {
-    async fn create_feedback(&self, new_feedback: &NewFeedback) -> Result<Feedback>;
-
-    async fn get_feedback(&self, id: String) -> Result<Option<Feedback>>;
-
-    async fn list_feedback_for_project(&self, project_id: String) -> Result<Vec<Feedback>>;
-}
+use super::FeedbackRepository;
 
 pub struct FeedbackRepositorySqlite {
     conn: Arc<Pool<SqliteConnectionManager>>,
